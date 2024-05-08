@@ -13,13 +13,14 @@ Needs the following libraries to be installed (they usually come with a standard
 - scipy
 - python (version 3.8 or higher works, lower versions not tested)
 
-After modifying the file no_gui_fitting.py with the necessary entries, the code can be simply executed using
+After modifying the file no_gui_fitting.py with the necessary entries, the code can be simply typing the command
+(on a terminal or inside a jupyter notebook):
 
-# python no_gui_fitting.py
+## python no_gui_fitting.py
 
-Alternatively, a GUI can be used (better if you know little about Python / want to be quick) by running:
+Alternatively, a GUI can be used (better if you know little about Python / want to be quick) by typing: 
 
-# python Graphic_user_interface.py
+## python Graphic_user_interface.py
 
 In this case, a GUI will appear where one can easily set the range of the different parameters. Note that the Monte Carlo
 fitting procedure will not look for optimal parameters outside of those ranges. For this reason, if the final fitting is not
