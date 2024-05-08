@@ -58,8 +58,6 @@ def geometric_onset( x_data, y_data, opt_params, verbose = False ):
 
     aa = opt_params[ 0 ]
     bb = opt_params[ 1 ]
-    cc = opt_params[ 2 ]
-    dd = opt_params[ 3 ]
     ee = opt_params[ 4 ]
 
     y_value_min = aa + bb * ee / ( 1.0 + ee )
@@ -69,7 +67,7 @@ def geometric_onset( x_data, y_data, opt_params, verbose = False ):
     log_mid_point = ( np.log( y_value_min ) + np.log( y_value_max ) ) / 2.0 
     y0 = np.exp(1)**( log_mid_point )  # y value of the mid point
     b_coeff = y0 / (root**alpha)
-    y_derivative = b_coeff * x_data**alpha 
+    #y_derivative = b_coeff * x_data**alpha 
     args_find_onset = ( y_value_min, b_coeff, alpha )
 
     #Find onset using bisection method
@@ -84,7 +82,7 @@ def geometric_onset( x_data, y_data, opt_params, verbose = False ):
     
 
 def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess, output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
-                     same_scale = False, mc_runs = 8, n_hopping = 1000, T_hopping = 1 ):
+                     same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3 ):
     data = pd.read_excel( my_file, sheet_name = sheet_name )
     x_data = data[x_name].values  
     y_data = data[y_name].values
@@ -108,8 +106,11 @@ def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
     best_sample = -1
     for i in range( mc_runs ):
       # Perform basin hopping optimization
+      print( f'Bounds for parameters: {bounds}' )
+
       result = basinhopping( objective_function, initial_guess, niter = n_hopping, T = T_hopping, minimizer_kwargs={"bounds" : bounds})
       if result.fun < best:
+        print( f"Found improved solution with residual {result.fun}" )
         best_sample = i
         best = result.fun
       weights[ i ] = 1.0 / result.fun
@@ -136,6 +137,7 @@ def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
     # Print the optimized parameters
     if verbose:
       print("Parameter for best solution:", all_opt_params[ best_sample ] )
+
     with open( output, 'w+' ) as my_f:
       par = [ "A", "B", "C", "D", "E" ]
       my_f.write( "Intensity approximated with fitting function A + B * E * ( 1.0 + C * x )^D / [ 1.0 + E * ( 1.0 + C * x )^D ] \n" )
@@ -153,13 +155,6 @@ def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
     y_mid = np.ones( 100 ) * y0
     y_onset = np.logspace( -1,5, 100 )
     x_onset = np.ones( 100 ) * onset
-    x_onset_plus = np.ones( 100 ) * ( onset + error_onset )
-    if onset - error_onset > 0:
-      if verbose:
-        print( "error_onset smaller then onset" ) 
-      x_onset_minus = np.ones( 100 ) * ( onset - error_onset )
-    else: 
-      x_onset_minus = np.ones( 100 ) * np.min( x_data )
 
     y_derivative = b_coeff * x_data**alpha 
     
@@ -187,8 +182,6 @@ def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
     plt.plot( x, y_mid, 'k-', ms = 0.3, label = 'Mid-point' )   # Horizontal line at the mid point in the log-log plot 
     plt.plot( x_onset, y_onset, 'k--', ms = 0.3, label = "Onset" ) # A vertical line at the onset
     plt.plot( x, y_min, 'k-', ms = 0.3, label = 'Minimum' )     # Horizontal line at the minimum (extrapolated at x = 0 )
-    #plt.plot( x_onset_plus, y_onset, 'r-.', ms = 0.3, label = "Onset + $\Delta$" ) # A vertical line at the onset
-    #plt.plot( x_onset_minus, y_onset, 'r-.', ms = 0.3, label = "Onset - $\Delta$" ) # A vertical line at the onset
     plt.legend()
     plt.savefig( graph_name )
     plt.close()

@@ -1,15 +1,15 @@
-import numpy as np
-import pandas as pd
-from scipy.optimize import basinhopping
-import matplotlib.pyplot as plt
-import scipy
-from final_theory import *
+from theory import calculate_onset 
 
 # Change the line belows to import data from the correct excel files and their internal pages
 my_file = "Binding_curve_values.xlsx"
 x_name = 'X - IgM'
 y_name = 'Y - binding signal'
 sheet_names = [ 'P2 ancestor - IgM cells only', 'P3 ancestor - IgM cells only' ]
+
+print( f"""This code takes the data from {my_file}, specifically, from the sheets {sheet_names}
+	and uses the columns {x_name} as X and {y_name} as Y data, then tries to fit
+        the data using a formula related to multivalent binding (details in the DETAILS.txt 
+        file)""" )
 
 for name in sheet_names:
   output_file = f'output_{name}.txt'
