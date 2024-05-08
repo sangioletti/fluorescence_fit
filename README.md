@@ -1,7 +1,7 @@
 # fluorescence_fit
-# Copyright Stefano Angioletti-Uberti 2024
-# email: sangiole@imperial.ac.uk
-# This code is distributed under a very permissive licence, see details in the LICENCE file.
+Copyright Stefano Angioletti-Uberti 2024
+email: sangiole@imperial.ac.uk
+This code is distributed under a very permissive licence, see details in the LICENCE file.
 
 Repository with the code to fit fluorescence data for Ig-mediated adsorption.
 
