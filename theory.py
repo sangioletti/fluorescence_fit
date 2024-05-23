@@ -91,7 +91,13 @@ def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
     #that the minimum intensity is positive, necessary for taking the logarithm later
     condition = y_data > 0.0
     x_data = np.extract( condition, x_data ) 
-    y_data = np.extract( condition, y_data ) 
+    y_data = np.extract( condition, y_data )
+
+    #Redefine bound on parameter B to be slightly higher than max_y if needed
+    if bounds[ 1 ][ 1 ] < np.max( y_data ):
+      boundsB = list( bounds[ 1 ] ) 
+      bounds[ 1 ] = ( boundsB[ 0 ], np.max( y_data ) ) 
+      print( f"Redefined bound on B to be at least as large as y_data, new upper bound is {boundsB[1]}" )
    
     # Not good python practice...but here we define objective function within another function 
     def objective_function( params ):
