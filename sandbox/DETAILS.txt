@@ -1,0 +1,52 @@
+In the following, we describe a numerical procedure to extract the onset of binding (the threshold IgM value at which binding starts to raise appreciably) from our experimental data in a quantitative way.
+
+First, we make the natural assumption that the measured fluorescence signal increases linearly with the amount of dextran bound, i.e.: 
+
+Eq.1)				S = A + I * theta
+
+Which allows us to interpolate the intensity with the functional form:
+
+Eq.2) 				S= A + B q / ( 1 + q )
+
+				with
+
+Eq.3)				q = C * ( 1 + D*x )^E 
+
+
+Where x is the number of IgM receptors per cell and A,B,C,D and E are fitting parameters. 
+
+In principle, one can try to relate the values of these parameters to other physical quantities characterising the system and, if known, they could be directly substituted inside Eq. 2). In this regard:
+- A  is related to the baseline value of the fluorescence signal
+- B is the proportionality constant between the amount of dextran adsorbed and the fluorescence provided, 
+- C = rho*vB is the activity of dextran in solution, wherei rho is the number concentration of dextran and  
+      vB  the so-called binding volume [Tian et al, 2019]. 
+- D = KD / N is the ratio of the dissociation constant 
+      of a single bond, expressed in Molar, and 
+      N, the number of adsoprtion sites per cell (so that x / N is the number of IgM per adsorption site). 
+- E is the number of ligands on a dextran molecule that can form bonds with the receptors on cell’s surface. 
+
+Whereas this microscopic interpretation could be useful in extracting additional information, compensation of errors 
+can make the exact values obtained for the fitting parameters quite sensitive, and thus their exact interpretation should 
+be done with care. Nevertheless, the general shape of the adsorption curve described by Eq.~1 fits the data rather well and, 
+together with a geometric construction, can be reliably used to extract the onset of binding, using the following procedure.
+
+First, we find the optimal value for the fitting parameters by performing a numerical fit of the logarithm of the measured signal. 
+We do this by using a basin-hopping Monte Carlo procedure to find the global optimum, as implemented in the Scipy python library, 
+with an effective temperature of T=3 and 2000 iterations. The code implemented in this directory is exactly the one used 
+for fitting and for building the geometrical construction necessary to find the onset is open source and can be directly 
+downloaded from https://www.github.com/sangioletti/fluorescence_fit. 
+
+Second, given the fitted curve, we define the onset of adsorption as the intercept along the x-axis between the intensity baseline 
+(i.e., the line described by the equation y = A) and a straight line tangent to the fitting curve at the mid-point between the 
+minimum and maximum intensity value.
+
+In commenting on this procedure, it should be noticed that there is always a degree of arbitrariness in defining the exact value for the onset. 
+For example, we could have defined it as the the x-value corresponding to the the mid-point of the fluorescence intensity. Notably, however, 
+all these different definitions will collapse to the same value for a perfect step-function, the only one for which an onset can be 
+unequivocally defined. In other words, the difference between different definitions becomes smaller the sharper is the increase of the 
+fluorescence intensity at the onset value. For our measured data, and in general for all systems where a superlinear increase of the 
+signal arises due to multivalency, we would expect all the different definitions to lead to relatively close values for the measured onset. 
+
+A final note is also necessary regarding the fitting procedure: given its stochastic nature, our basin-hopping Monte Carlo scheme will 
+lead a slightly different result each time. The reported value of the onset is the value found for the best fitting curve obtained within the
+different MC runs performed, that is, the curve providing 1the lowest mean square root deviation from the experimental data.
