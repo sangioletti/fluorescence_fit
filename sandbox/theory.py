@@ -92,8 +92,8 @@ def geometric_onset( x_data, y_data, opt_params, verbose = False ):
     
 def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, function_type = "multivalent",
                    onset_fitting = False,
-                   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
-                   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3 ):
+                   verbose = False,
+                   mc_runs = 8, n_hopping = 2000, T_hopping = 3 ):
 
     data = pd.read_excel( my_file, sheet_name = sheet_name )
     x_data = data[x_name].values  
