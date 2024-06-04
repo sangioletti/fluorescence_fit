@@ -1,0 +1,392 @@
+/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/theory.py:46: RuntimeWarning: divide by zero encountered in log
+  return np.log( b * x**alpha ) - np.log( y_value_min )
+/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/theory.py:46: RuntimeWarning: divide by zero encountered in log
+  return np.log( b * x**alpha ) - np.log( y_value_min )
+/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/theory.py:46: RuntimeWarning: divide by zero encountered in log
+  return np.log( b * x**alpha ) - np.log( y_value_min )
+This code takes the data from Expt 17 IgM+ only IgG-dextran.xlsx, specifically, from the sheets ['P1 ancestor', 'P2 ancestor', 'P3 ancestor', 'P4 ancestor', 'TJ0', 'TJ4']
+	and uses the columns bv421 IgM as X and pe Klickmer as Y data, then tries to fit
+        the data using a formula related to multivalent binding (details in the DETAILS.txt 
+        file)
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9145095894415797
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 34752.286544047194
+y value for the midpoint is 133.93740630005118
+Derivative at midpoint is: 1.434748878518293
+Onset found at 16843.546606109303
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 39148.11024199929
+y value for the midpoint is 157.1630204782147
+Derivative at midpoint is: 1.44894522319879
+Onset found at 17141.249873820634
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9145092757768373
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 34267.80475870703
+y value for the midpoint is 131.52702131473274
+Derivative at midpoint is: 1.4314884016395373
+Onset found at 16788.814992892112
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 33731.01828001696
+y value for the midpoint is 128.88892508563183
+Derivative at midpoint is: 1.4179673450845658
+Onset found at 16658.879699525365
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 33431.12508615506
+y value for the midpoint is 126.83417977828387
+Derivative at midpoint is: 1.4444768372283032
+Onset found at 16848.288515791046
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 35149.51308774374
+y value for the midpoint is 136.19409492099643
+Derivative at midpoint is: 1.4282067446749012
+Onset found at 16806.56026170683
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 34241.53033850479
+y value for the midpoint is 131.34953566412324
+Derivative at midpoint is: 1.4348826450698777
+Onset found at 16815.295580600497
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 35515.5879387677
+y value for the midpoint is 138.2030730008552
+Derivative at midpoint is: 1.4215248055670717
+Onset found at 16777.01032984965
+0, [4.72409012e+01 3.31377675e+02 1.65732432e-04 3.52312274e+00
+ 4.22174326e-04]
+1, [4.74840869e+01 4.72561136e+02 6.97008025e-04 2.80286902e+00
+ 2.58088779e-05]
+2, [4.71956737e+01 3.18049860e+02 1.45450325e-04 3.64775440e+00
+ 5.28386532e-04]
+3, [4.72527784e+01 3.03222691e+02 1.51877333e-04 3.66149012e+00
+ 4.84042164e-04]
+4, [4.66689808e+01 2.94606966e+02 7.24849467e-05 4.43542120e+00
+ 1.59299443e-03]
+5, [4.74102309e+01 3.43262886e+02 2.44526770e-04 3.29905300e+00
+ 2.00846416e-04]
+6, [4.71736595e+01 3.17236205e+02 1.42798804e-04 3.67099160e+00
+ 5.37931990e-04]
+7, [4.75633222e+01 3.53778701e+02 3.86052954e-04 3.12660681e+00
+ 7.69812525e-05]
+Parameter for best solution: [4.71956737e+01 3.18049860e+02 1.45450325e-04 3.64775440e+00
+ 5.28386532e-04 4.73636383e+01 1.31527021e+02 1.43148840e+00
+ 4.24011726e-05 1.67888150e+04]
+Redefined bound on B to be at least as large as y_data, new upper bound is 20000
+Bounds for parameters: [(0, 1000), (1, 131165.0), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 1.0674565156279139
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 9143.24784516207
+y value for the midpoint is 643.4511457540184
+Derivative at midpoint is: 2.9607022462675654
+Onset found at 4284.5128037936975
+Bounds for parameters: [(0, 1000), (1, 131165.0), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 1.0046875903175618
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 11622.824152655136
+y value for the midpoint is 1232.8129977045162
+Derivative at midpoint is: 3.028347278986813
+Onset found at 4400.804103929685
+Bounds for parameters: [(0, 1000), (1, 131165.0), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 1.0010699998621233
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 14028.277108179076
+y value for the midpoint is 2070.9183206705757
+Derivative at midpoint is: 2.959308472635983
+Onset found at 4261.762193067544
+Bounds for parameters: [(0, 1000), (1, 131165.0), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 9376.238057221182
+y value for the midpoint is 679.49073782404
+Derivative at midpoint is: 3.162096806945931
+Onset found at 4681.554906795714
+Bounds for parameters: [(0, 1000), (1, 131165.0), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 9964.998680431381
+y value for the midpoint is 784.5377044558809
+Derivative at midpoint is: 2.8329362967448213
+Onset found at 3974.251736533133
+Bounds for parameters: [(0, 1000), (1, 131165.0), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 8905.926374543093
+y value for the midpoint is 635.8867712806477
+Derivative at midpoint is: 2.8198445750959116
+Onset found at 3959.0615818800275
+Bounds for parameters: [(0, 1000), (1, 131165.0), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 9441.037969206876
+y value for the midpoint is 691.5269208189778
+Derivative at midpoint is: 3.3757782287645974
+Onset found at 5081.2330439871885
+Bounds for parameters: [(0, 1000), (1, 131165.0), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 8832.102959851689
+y value for the midpoint is 639.7013554642471
+Derivative at midpoint is: 2.299013469747629
+Onset found at 2749.4104393860803
+0, [5.46470848e+01 6.01517466e+03 1.83185633e-05 2.50000000e+01
+ 2.26006687e-03]
+1, [5.47691515e+01 2.32901514e+04 9.98915974e-05 6.21301293e+00
+ 4.43903802e-04]
+2, [5.27370436e+01 7.03118154e+04 1.83979517e-04 4.33771888e+00
+ 1.16817881e-04]
+3, [6.57049689e+01 6.04362654e+03 1.96909263e-05 2.49999534e+01
+ 1.63566437e-03]
+4, [3.09077110e+01 1.05758819e+04 1.46007234e-05 2.50000000e+01
+ 2.57102255e-03]
+5, [5.51271154e+01 6.19962302e+03 6.17821512e-05 9.59795224e+00
+ 1.53795003e-03]
+6, [7.91875275e+01 5.51921798e+03 2.19292166e-05 2.49999926e+01
+ 1.13030280e-03]
+7, [2.53818051e-09 9.35779935e+03 2.78605307e-05 1.24962991e+01
+ 4.69506222e-03]
+Parameter for best solution: [5.27370436e+01 7.03118154e+04 1.83979517e-04 4.33771888e+00
+ 1.16817881e-04 6.09497615e+01 2.07091832e+03 2.95930847e+00
+ 1.10636366e-09 4.26176219e+03]
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.8994703260265098
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 21621.58771330867
+y value for the midpoint is 355.3954345844892
+Derivative at midpoint is: 2.0223506986057807
+Onset found at 8682.220704012843
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.8993299967161563
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 22809.7914225003
+y value for the midpoint is 391.7356725835574
+/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/theory.py:46: RuntimeWarning: divide by zero encountered in log
+  return np.log( b * x**alpha ) - np.log( y_value_min )
+/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/theory.py:46: RuntimeWarning: divide by zero encountered in log
+  return np.log( b * x**alpha ) - np.log( y_value_min )
+Derivative at midpoint is: 2.0338883332272015
+Onset found at 8762.684573288818
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.8990683415513547
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 24880.77724903112
+y value for the midpoint is 461.1645135428154
+Derivative at midpoint is: 2.0203876917750474
+Onset found at 8900.988073174538
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 19832.37488574868
+y value for the midpoint is 298.943562925946
+Derivative at midpoint is: 2.0702495094320996
+Onset found at 8805.769061206887
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 32683.575228691196
+y value for the midpoint is 784.7743951692178
+Derivative at midpoint is: 2.080304383588873
+Onset found at 9163.094208086013
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 21955.348540122195
+y value for the midpoint is 366.5314291616669
+Derivative at midpoint is: 1.9845295558491467
+Onset found at 8505.116308849934
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 23178.147437871816
+y value for the midpoint is 402.6762116583094
+Derivative at midpoint is: 2.0414807348481814
+Onset found at 8792.690944665612
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 22564.431249658504
+y value for the midpoint is 385.4604456488226
+Derivative at midpoint is: 2.020728984822217
+Onset found at 8723.321587211527
+0, [5.58913602e+01 2.19358783e+03 4.35671230e-04 3.07424638e+00
+ 1.17446410e-04]
+1, [5.57267110e+01 2.68610918e+03 4.87526573e-04 2.95395078e+00
+ 9.00763769e-05]
+2, [5.77842852e+01 3.62188611e+03 2.08172545e-03 2.64948482e+00
+ 3.42040861e-06]
+3, [5.41109860e+01 1.55125689e+03 1.23082896e-04 4.23114301e+00
+ 1.00457275e-03]
+4, [5.56837128e+01 1.10021674e+04 2.97513703e-03 2.42276543e+00
+ 1.05743544e-06]
+5, [5.57260040e+01 2.35118327e+03 7.84660612e-04 2.85338870e+00
+ 3.84976043e-05]
+6, [5.53280717e+01 2.85761101e+03 4.23502758e-04 2.96860409e+00
+ 1.17844709e-04]
+7, [5.63826674e+01 2.57400990e+03 7.20391141e-04 2.88087216e+00
+ 4.00576777e-05]
+Parameter for best solution: [5.77842852e+01 3.62188611e+03 2.08172545e-03 2.64948482e+00
+ 3.42040861e-06 5.77966735e+01 4.61164514e+02 2.02038769e+00
+ 6.06047237e-07 8.90098807e+03]
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9671618810834757
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 37625.66244480996
+y value for the midpoint is 108.24721178147846
+Derivative at midpoint is: 1.0355891640769848
+Onset found at 14492.271157385461
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9671610169503189
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 34330.244630219386
+y value for the midpoint is 98.79968055711835
+Derivative at midpoint is: 1.0219075435713996
+Onset found at 14249.602677922883
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 40338.176936237614
+y value for the midpoint is 117.23883445714414
+Derivative at midpoint is: 1.0902060641595355
+Onset found at 15183.7035862731
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9671607190826117
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 37377.929342015734
+y value for the midpoint is 107.6945668081699
+Derivative at midpoint is: 1.0567319315541872
+Onset found at 14717.838618312737
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 37329.3775030392
+y value for the midpoint is 107.43548647930402
+Derivative at midpoint is: 1.0301651840120116
+Onset found at 14434.103112053512
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 41383.32295554129
+y value for the midpoint is 119.70392869711358
+Derivative at midpoint is: 1.0831553871646264
+Onset found at 15156.11668412775
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 37935.70950885967
+y value for the midpoint is 109.35193484916806
+Derivative at midpoint is: 1.055842595897408
+Onset found at 14739.423681068838
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9671606405840625
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 35083.10707805131
+y value for the midpoint is 101.09095367295284
+Derivative at midpoint is: 1.038699688175876
+Onset found at 14433.15102810124
+0, [3.83865352e+01 2.52357431e+02 6.77487059e-05 3.08932947e+00
+ 7.64689215e-03]
+1, [3.69269803e+01 2.05731575e+02 3.06766424e-05 4.54951916e+00
+ 1.63008932e-02]
+2, [3.88448202e+01 3.01318868e+02 8.33730263e-05 2.85903804e+00
+ 5.21100115e-03]
+3, [3.76317395e+01 2.50723899e+02 4.83899810e-05 3.50057554e+00
+ 1.04372683e-02]
+4, [3.86175951e+01 2.47310409e+02 7.20389985e-05 3.05693363e+00
+ 7.12882058e-03]
+5, [3.86890846e+01 3.16632276e+02 8.68352666e-05 2.74920779e+00
+ 5.19969923e-03]
+6, [3.81822038e+01 2.58520393e+02 6.02117742e-05 3.21859802e+00
+ 8.26934048e-03]
+7, [3.68980240e+01 2.17419967e+02 3.21682199e-05 4.37764120e+00
+ 1.53429358e-02]
+Parameter for best solution: [3.68980240e+01 2.17419967e+02 3.21682199e-05 4.37764120e+00
+ 1.53429358e-02 4.01834761e+01 1.01090954e+02 1.03869969e+00
+ 1.92185389e-03 1.44331510e+04]
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9343280818174791
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 16450.565246937793
+y value for the midpoint is 70.02122006483687
+Derivative at midpoint is: 0.658889638824416
+Onset found at 10416.480661505562
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.934307405553611
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 17065.25946280229
+y value for the midpoint is 71.71747636615818
+Derivative at midpoint is: 0.6161183803497067
+Onset found at 10094.739123302163
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.934292232618361
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 19147.53879770369
+y value for the midpoint is 76.47854683638526
+Derivative at midpoint is: 0.6161131853136205
+Onset found at 10192.336598385637
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 17579.24245961823
+y value for the midpoint is 72.97990232784322
+Derivative at midpoint is: 0.6432821608585574
+Onset found at 10330.681568633554
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9342863250234851
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 17928.326539603375
+/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/theory.py:46: RuntimeWarning: divide by zero encountered in log
+  return np.log( b * x**alpha ) - np.log( y_value_min )
+y value for the midpoint is 73.5829634807566
+Derivative at midpoint is: 0.5859296874905785
+Onset found at 9872.394248761591
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 19030.105817246196
+y value for the midpoint is 76.13844758224695
+Derivative at midpoint is: 0.6068398042417515
+Onset found at 10109.180918776387
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9342858649842517
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 18085.25484226971
+y value for the midpoint is 73.87832840846045
+Derivative at midpoint is: 0.5840697305720227
+Onset found at 9866.039103085288
+Bounds for parameters: [(0, 1000), (1, 20000), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 16820.766724417015
+y value for the midpoint is 71.16037520930855
+Derivative at midpoint is: 0.5829546448750964
+Onset found at 9802.934178194851
+0, [5.16146180e+01 4.30075269e+01 2.11166999e-05 1.69959529e+01
+ 4.71200312e-03]
+1, [5.18739813e+01 4.72345302e+01 1.95397320e-04 4.99149061e+00
+ 4.79437133e-04]
+2, [5.18587376e+01 6.09273598e+01 2.06938947e-03 3.29272378e+00
+ 3.41995789e-06]
+3, [5.17998092e+01 5.09352298e+01 1.48539263e-04 5.24740144e+00
+ 8.43605772e-04]
+4, [5.18740390e+01 5.25022307e+01 1.47811829e-03 3.51392602e+00
+ 6.17252691e-06]
+5, [5.18664346e+01 5.99017572e+01 1.66606615e-03 3.30130281e+00
+ 6.80886826e-06]
+6, [5.18559413e+01 5.33968406e+01 1.72941412e-03 3.44131856e+00
+ 4.50516850e-06]
+7, [5.19419671e+01 4.55424254e+01 5.06170799e-04 4.17299730e+00
+ 6.03425976e-05]
+Parameter for best solution: [5.18559413e+01 5.33968406e+01 1.72941412e-03 3.44131856e+00
+ 4.50516850e-06 5.18561819e+01 7.38783284e+01 5.84069731e-01
+ 2.40958699e-01 9.86603910e+03]
+Redefined bound on B to be at least as large as y_data, new upper bound is 20000
+Bounds for parameters: [(0, 1000), (1, 62859.6), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.9363093002844567
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 5099.657778159503
+y value for the midpoint is 962.5531053342022
+Derivative at midpoint is: 2.2786300892200777
+Onset found at 2520.83852407116
+Bounds for parameters: [(0, 1000), (1, 62859.6), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.8891929828794182
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 6554.144421157174
+y value for the midpoint is 1582.0274162620744
+Derivative at midpoint is: 2.518216558529147
+Onset found at 3059.1762506041878
+Bounds for parameters: [(0, 1000), (1, 62859.6), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 5772.028913193482
+y value for the midpoint is 1200.9321354591746
+Derivative at midpoint is: 2.7522707965848947
+Onset found at 3374.6413523362
+Bounds for parameters: [(0, 1000), (1, 62859.6), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 5260.8931629701865
+y value for the midpoint is 1015.2542746533725
+Derivative at midpoint is: 2.2511144898521036
+Onset found at 2474.264110418111
+Bounds for parameters: [(0, 1000), (1, 62859.6), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 5782.118266648298
+y value for the midpoint is 1218.0348130146485
+Derivative at midpoint is: 2.3237219107137617
+Onset found at 2597.051436934747
+Bounds for parameters: [(0, 1000), (1, 62859.6), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+Found improved solution with residual 0.8781070091313504
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 8072.642892299885
+y value for the midpoint is 2463.4352827186963
+Derivative at midpoint is: 2.1798596605495724
+Onset found at 2328.6421816469096
+Bounds for parameters: [(0, 1000), (1, 62859.6), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 5780.130211375068
+y value for the midpoint is 1263.431196862356
+Derivative at midpoint is: 2.455535017756708
+Onset found at 2852.3744062419482
+Bounds for parameters: [(0, 1000), (1, 62859.6), (1e-09, 1.0), (1, 25), (1e-09, 1.0)]
+x value corresponding to the mid point between max and min fluorescence on log-log plot = 4845.941890962828
+y value for the midpoint is 878.8549357847904
+Derivative at midpoint is: 2.5032471801558005
+Onset found at 2864.894337037763
+0, [1.66369520e+02 4.62739178e+03 3.01070579e-05 2.49981294e+01
+ 5.84813764e-03]
+1, [2.23250078e+02 1.05543197e+04 2.31983519e-04 5.57849733e+00
+ 8.50987457e-04]
+2, [2.67132914e+02 4.99395058e+03 6.64812629e-05 1.56993724e+01
+ 1.40373387e-03]
+3, [1.50391644e+02 5.39676153e+03 2.73719090e-05 2.50000000e+01
+ 6.60708307e-03]
+4, [1.58876305e+02 7.66461049e+03 7.37189045e-05 1.03753007e+01
+ 4.02928148e-03]
+5, [1.48285633e+02 3.68750620e+04 5.24130117e-04 3.05977987e+00
+ 4.23902615e-04]
+6, [2.17136473e+02 6.94002032e+03 2.61365091e-04 5.80267623e+00
+ 8.49884405e-04]
+7, [2.28451359e+02 3.04746203e+03 4.34081622e-05 2.47434523e+01
+ 2.40973944e-03]
+Parameter for best solution: [1.48285633e+02 3.68750620e+04 5.24130117e-04 3.05977987e+00
+ 4.23902615e-04 1.63910445e+02 2.46343528e+03 2.17985966e+00
+ 7.49540579e-06 2.32864218e+03]

@@ -1,0 +1,1 @@
+rm *.pdf *.txt OUT*
