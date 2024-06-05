@@ -55,7 +55,7 @@ def find_middle( x, a, b, c, d, e ):
 def onset_value( x, y_value_min, b, alpha ):
     return np.log( b * x**alpha ) - np.log( y_value_min )
     
-def geometric_onset_from_fit( x_data, y_data, opt_params, verbose = False ):
+def calculate_onset_from_fit( x_data, y_data, opt_params, verbose = False ):
     '''This function simply take the input experimental data and the parameters of the fitted model
     and use it to calculate the onset of adsorption'''
     # Find mid point between max and minimum in logarithmic space and calculate the logarithmic derivative 
@@ -152,7 +152,7 @@ def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, f
       all_opt_params[ i, :-5 ] = result.x
 
       if function_type == "multivalent" and onset_fitting:
-          onset, b_coeff, alpha, y0, y_min_value = geometric_onset_from_fit( x_data, y_data, 
+          onset, b_coeff, alpha, y0, y_min_value = calculate_onset_from_fit( x_data, y_data, 
                                                                     all_opt_params[ i, :-5 ], 
                                                                     verbose = verbose )
           all_opt_params[ i, -1 ] = onset
@@ -164,45 +164,29 @@ def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, f
     return x_data, y_data, all_opt_params, weights, best_sample, minimum_loss
 
 
-def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess, 
-		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
-		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3, 
+def calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, 
+		   output = 'output.txt', verbose = False,
                    save_data = True ):
     
-    x_data, y_data, all_opt_params, weights, best_sample, minimum_loss = find_best_fit( my_file, sheet_name, x_name, 
-                   y_name, bounds, initial_guess, function_type = "multivalent", onset_fitting = True,
-                   output = output, graph_name = graph_name, verbose = verbose,
-                  same_scale = same_scale, mc_runs = mc_runs, n_hopping = n_hopping, T_hopping = T_hopping )
-
-    onset, b_coeff, alpha, y0, y_min_value = geometric_onset_from_fit( x_data, y_data, 
-                                                              all_opt_params[ i, :-5 ], 
-                                                              verbose = verbose 
-                                                             )
-    all_opt_params[ i, -1 ] = onset
-    all_opt_params[ i, -2 ] = b_coeff 
-    all_opt_params[ i, -3 ] = alpha
-    all_opt_params[ i, -4 ] = y0
-    all_opt_params[ i, -5 ] = y_min_value
-
     ave_opt_params = np.average( all_opt_params, axis = 0, weights = weights ) 
     error_onset = np.sqrt( np.var( all_opt_params[ -1 ], axis = 0 ) ) 
     average_onset = opt_params[ -1 ]
     
-    onset_coeffs = {}  
-    onset_coeffs[ 'onset' ] = all_opt_params[ best_sample, -1 ]
-    onset_coeffs[ 'b_coeff'] = all_opt_params[ best_sample, -2 ]
-    onset_coeffs[ 'alpha'] = all_opt_params[ best_sample, -3 ]
-    onset_coeffs[ 'y0'] = all_opt_params[ best_sample, -4 ]
-    onset_coeffs[ 'y_value_min'] = all_opt_params[ best_sample, -5 ]
+    best_onset_coeffs = {}  
+    best_onset_coeffs[ 'onset' ] = all_opt_params[ best_sample, -1 ]
+    best_onset_coeffs[ 'b_coeff'] = all_opt_params[ best_sample, -2 ]
+    best_onset_coeffs[ 'alpha'] = all_opt_params[ best_sample, -3 ]
+    best_onset_coeffs[ 'y0'] = all_opt_params[ best_sample, -4 ]
+    best_onset_coeffs[ 'y_value_min'] = all_opt_params[ best_sample, -5 ]
 
     if save_data:
     #Save fitting data to file and calculate averages of the fits found during MC procedure
 
-      save_fit_data( all_opt_params, opt_params, error_onset, average_onset, onset_coeffs, 
+      save_fit_data( all_opt_params, opt_params, error_onset, average_onset, best_onset_coeffs, 
                    function_type = "multivalent",
 		   output = output, verbose = False )
 
-    return x_data, y_data, best_sample, all_opt_params, ave_opt_params, error_onset, average_onset, onset_coeffs
+    return ave_opt_params, error_onset, average_onset, best_onset_coeffs
 
 
 def full_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
@@ -211,15 +195,8 @@ def full_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
 		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3, save_data = True ):
     ''''Does both fitting of the curve, calculate the onset and plot the graphs'''
 
-    if function_type == 'multivalent':
-      x_data, y_data, best_sample, all_opt_params, ave_opt_params, error_onset, average_onset, onset_coeffs = calculate_onset( my_file, sheet_name, x_name, 
-                   y_name, bounds, initial_guess, 
-		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
-		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3, save_data = save_data ):
-    
-    else:
-      x_data, y_data, all_opt_params, weights, best_sample, minimum_loss = find_best_fit( my_file, sheet_name, x_name, 
-                   y_name, bounds, initial_guess, function_type = 'constant', onset_fitting = onset_fitting,
+    x_data, y_data, all_opt_params, weights, best_sample, minimum_loss = find_best_fit( my_file, sheet_name, x_name, 
+                   y_name, bounds, initial_guess, function_type = function_type, onset_fitting = onset_fitting,
                    output = output, graph_name = graph_name, verbose = verbose,
                    same_scale = same_scale, mc_runs = mc_runs, n_hopping = n_hopping, T_hopping = T_hopping )
 
@@ -227,6 +204,12 @@ def full_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
                    function_type = "multivalent", onset_fitting = True, 
 		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False
 		   same_scale = False ):
+    
+    ##Now average the onset and save the data
+    if function_type == 'multivalent':
+      calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, 
+   		   output = 'output.txt', verbose = False,
+                   save_data = True ):
 
     return
 
