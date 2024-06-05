@@ -57,6 +57,8 @@ def find_onset( x, y_value_min, b, alpha ):
 
     
 def geometric_onset( x_data, y_data, opt_params, verbose = False ):
+    '''This function simply take the input experimental data and the parameters of the fitted model
+    and use it to calculate the onset of adsorption'''
     # Find mid point between max and minimum in logarithmic space and calculate the logarithmic derivative 
     # at that point.
     # Starting guess for mid point
@@ -162,128 +164,88 @@ def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, f
 
     return x_data, y_data, all_opt_params, weights, best_sample, minimum_loss
 
+
+
 def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess, 
 		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
-		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3 ):
+		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3, 
+                   save_data = True ):
     
     x_data, y_data, all_opt_params, weights, best_sample, minimum_loss = find_best_fit( my_file, sheet_name, x_name, 
                    y_name, bounds, initial_guess, function_type = "multivalent", onset_fitting = True,
                    output = output, graph_name = graph_name, verbose = verbose,
-                   same_scale = same_scale, mc_runs = mc_runs, n_hopping = n_hopping, T_hopping = T_hopping )
+                  same_scale = same_scale, mc_runs = mc_runs, n_hopping = n_hopping, T_hopping = T_hopping )
 
+    onset, b_coeff, alpha, y0, y_min_value = geometric_onset( x_data, y_data, 
+                                                              all_opt_params[ i, :-5 ], 
+                                                              verbose = verbose 
+                                                             )
+    all_opt_params[ i, -1 ] = onset
+    all_opt_params[ i, -2 ] = b_coeff 
+    all_opt_params[ i, -3 ] = alpha
+    all_opt_params[ i, -4 ] = y0
+    all_opt_params[ i, -5 ] = y_min_value
 
-    for i in range( mc_runs ):
-      print( f"{i}, {all_opt_params[ i, :-5 ]}" )
-
-    opt_params = np.average( all_opt_params, axis = 0, weights = weights ) 
+    ave_opt_params = np.average( all_opt_params, axis = 0, weights = weights ) 
     error_onset = np.sqrt( np.var( all_opt_params[ -1 ], axis = 0 ) ) 
     average_onset = opt_params[ -1 ]
-    onset = all_opt_params[ best_sample, -1 ]
-    b_coeff = all_opt_params[ best_sample, -2 ]
-    alpha = all_opt_params[ best_sample, -3 ]
-    y0 = all_opt_params[ best_sample, -4 ]
-    y_value_min = all_opt_params[ best_sample, -5 ]
     
-    # Print the optimized parameters
-    if verbose:
-      print("Parameter for best solution:", all_opt_params[ best_sample ] )
+    onset_coeffs = {}  
+    onset_coeffs[ 'onset' ] = all_opt_params[ best_sample, -1 ]
+    onset_coeffs[ 'b_coeff'] = all_opt_params[ best_sample, -2 ]
+    onset_coeffs[ 'alpha'] = all_opt_params[ best_sample, -3 ]
+    onset_coeffs[ 'y0'] = all_opt_params[ best_sample, -4 ]
+    onset_coeffs[ 'y_value_min'] = all_opt_params[ best_sample, -5 ]
 
-    with open( output, 'w+' ) as my_f:
-      par = [ "A", "B", "C", "D", "E" ]
-      my_f.write( "Intensity approximated with fitting function A + B * E * ( 1.0 + C * x )^D / [ 1.0 + E * ( 1.0 + C * x )^D ] \n" )
-      for name, val in zip( par, all_opt_params[ best_sample ] ):
-        my_f.write( f"{name}  {val} \n" ) 
-      #print("Optimized Parameters:", result.x)
-      my_f.write( f'Logarithmic Derivative at midpoint (superselectivity parameter): {alpha} \n' )
-      my_f.write( f'Onset for best solution at x = {onset} \n' )
-      my_f.write( f'AVERAGE onset found at x = {average_onset} \n' )
-      my_f.write( f'ERROR on average onset: {error_onset} \n' )
-      my_f.write( f"Residual on the logarithm: {minimum_loss} \n" ) 
+    if save_data:
+    #Save fitting data to file and calculate averages of the fits found during MC procedure
 
-    # Ok, now prepare to make the plots
-    x = np.logspace( np.log10( np.min( x_data )), np.log10( np.max( x_data ) ), 100 )
-    y_min = np.ones( 100 ) * y_value_min
-    y_mid = np.ones( 100 ) * y0
-    y_onset = np.logspace( -1,5, 100 )
-    x_onset = np.ones( 100 ) * onset
+      save_fit_data( all_opt_params, opt_params, error_onset, average_onset, onset_coeffs, 
+                   function_type = "multivalent",
+		   output = output, verbose = False )
 
-    y_derivative = b_coeff * x_data**alpha 
-    
-    # Plot the best fit function 
-    #y_fit = sample_function( x, a = opt_params[ 0 ], b = opt_params[ 1 ], c = opt_params[ 2 ], d = opt_params[ 3 ], e = opt_params[ 4 ] ) 
-    y_fit = sample_function( x, 
-                             a = all_opt_params[ best_sample, 0 ], 
-                             b = all_opt_params[ best_sample, 1 ], 
-                             c = all_opt_params[ best_sample, 2 ], 
-                             d = all_opt_params[ best_sample, 3 ], 
-                             e = all_opt_params[ best_sample, 4 ] ) 
-
-    plt.xscale( 'log' )
-    plt.yscale( 'log' )
-    if same_scale:
-      yrange = np.max( y_data ) / np.min( y_data )
-      plt.xlim( np.min( x_data ), yrange * np.min( x_data ) )
-    else:
-      plt.xlim( np.min( x_data ), np.max( x_data ))
-
-    plt.ylim( np.min( y_data ), np.max( y_data ) )
-    plt.plot( x_data, y_data, 'g.', ms = 1.0, label = 'Exp.' )  # Experimental data
-    plt.plot( x, y_fit, 'b-', ms = 0.6, label = 'Best fit' )   # Fitted curve
-    plt.plot( x_data, y_derivative, 'r-.', ms = 0.3, label = 'Tangent' ) # Plot of the tangent in the log-log plot
-    plt.plot( x, y_mid, 'k-', ms = 0.3, label = 'Mid-point' )   # Horizontal line at the mid point in the log-log plot 
-    plt.plot( x_onset, y_onset, 'k--', ms = 0.3, label = "Onset" ) # A vertical line at the onset
-    plt.plot( x, y_min, 'k-', ms = 0.3, label = 'Minimum' )     # Horizontal line at the minimum (extrapolated at x = 0 )
-    plt.legend()
-    plt.savefig( graph_name )
-    plt.close()
+    return x_data, y_data, best_sample, all_opt_params, ave_opt_params, error_onset, average_onset, onset_coeffs
 
 
-def graphical_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
+def full_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
                    function_type = "multivalent", onset_fitting = True, 
 		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
-		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3 ):
+		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3, save_data = True ):
+    ''''Does both fitting of the curve, calculate the onset and plot the graphs'''
+
+    if function_type == 'multivalent':
+      x_data, y_data, best_sample, all_opt_params, ave_opt_params, error_onset, average_onset, onset_coeffs = calculate_onset( my_file, sheet_name, x_name, 
+                   y_name, bounds, initial_guess, 
+		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
+		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3, save_data = save_data ):
     
-    x_data, y_data, all_opt_params, weights, best_sample, minimum_loss = find_best_fit( my_file, sheet_name, x_name, 
-                   y_name, bounds, initial_guess, function_type = function_type, onset_fitting = onset_fitting,
+    else:
+      x_data, y_data, all_opt_params, weights, best_sample, minimum_loss = find_best_fit( my_file, sheet_name, x_name, 
+                   y_name, bounds, initial_guess, function_type = 'constant', onset_fitting = onset_fitting,
                    output = output, graph_name = graph_name, verbose = verbose,
                    same_scale = same_scale, mc_runs = mc_runs, n_hopping = n_hopping, T_hopping = T_hopping )
 
+    plot_fitted_curve( x_data, y_data, all_opt_params, weights, best_sample, 
+                   function_type = "multivalent", onset_fitting = True, 
+		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False
+		   same_scale = False ):
 
-    for i in range( mc_runs ):
-      print( f"{i}, {all_opt_params[ i, :-5 ]}" )
+    return
 
-    opt_params = np.average( all_opt_params, axis = 0, weights = weights ) 
-    error_onset = np.sqrt( np.var( all_opt_params[ -1 ], axis = 0 ) ) 
-    average_onset = opt_params[ -1 ]
+def plot_fitted_curve( x_data, y_data, all_opt_params, onset_coeffs, best_sample, 
+                   function_type = "multivalent", onset_fitting = True, 
+		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False
+		   same_scale = False ):
+
+    ''''Take results of fitting and plot it'''
 
     if function_type == "multivalent":
-      onset = all_opt_params[ best_sample, -1 ]
-      b_coeff = all_opt_params[ best_sample, -2 ]
-      alpha = all_opt_params[ best_sample, -3 ]
-      y0 = all_opt_params[ best_sample, -4 ]
-      y_value_min = all_opt_params[ best_sample, -5 ]
-    
-    # Print the optimized parameters
-    if verbose:
-      print("Parameter for best solution:", all_opt_params[ best_sample ] )
-
-    with open( output, 'w+' ) as my_f:
-      par = [ "A", "B", "C", "D", "E" ]
-      if function_type == "multivalent":
-        my_f.write( "Intensity approximated with fitting function A + B * E * ( 1.0 + C * x )^D / [ 1.0 + E * ( 1.0 + C * x )^D ] \n" )
-        for name, val in zip( par, all_opt_params[ best_sample ] ):
-          my_f.write( f"{name}  {val} \n" ) 
-        #print("Optimized Parameters:", result.x)
-        my_f.write( f'Logarithmic Derivative at midpoint (superselectivity parameter): {alpha} \n' )
-        my_f.write( f'Onset for best solution at x = {onset} \n' )
-        my_f.write( f'AVERAGE onset found at x = {average_onset} \n' )
-        my_f.write( f'ERROR on average onset: {error_onset} \n' )
-        my_f.write( f"Residual on the logarithm: {minimum_loss} \n" ) 
-      elif function_type == "constant":
-        my_f.write( "Intensity approximated with constant fitting function f(x) = A \n" )
-        my_f.write( f"A {all_opt_params[ best_sample ][ 0 ]} \n" ) 
-        my_f.write( f"Residual on the logarithm: {minimum_loss} \n" ) 
-
+      onset = onset_coeffs[ 'onset' ] 
+      b_coeff = onset_coeffs[ 'b_coeff'] 
+      alpha = onset_coeffs[ 'alpha'] 
+      y0 = onset_coeffs[ 'y0'] 
+      y_value_min = onset_coeffs[ 'y_value_min']
+ 
     # Ok, now prepare to make the plots
     x = np.logspace( np.log10( np.min( x_data )), np.log10( np.max( x_data ) ), 100 )
 
@@ -330,3 +292,41 @@ def graphical_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_gues
     plt.legend()
     plt.savefig( graph_name )
     plt.close()
+
+    return
+
+def save_fit_data( all_opt_params, opt_params, best_sample, error_onset, average_onset, onset_coeffs, 
+                   function_type = "multivalent",
+		   output = 'output.txt', verbose = False,
+                   save = True ):
+    ''''Take result of fitting_calculate average and save it in a file'''
+    
+    if function_type == "multivalent":
+      onset = onset_coeffs[ 'onset' ] 
+      b_coeff = onset_coeffs[ 'b_coeff'] 
+      alpha = onset_coeffs[ 'alpha'] 
+      y0 = onset_coeffs[ 'y0'] 
+      y_value_min = onset_coeffs[ 'y_value_min'] 
+    
+    # Print the optimized parameters
+    if verbose:
+      print("Parameter for best solution:", all_opt_params[ best_sample ] )
+
+    with open( output, 'w+' ) as my_f:
+      par = [ "A", "B", "C", "D", "E" ]
+      if function_type == "multivalent":
+        my_f.write( "Intensity approximated with fitting function A + B * E * ( 1.0 + C * x )^D / [ 1.0 + E * ( 1.0 + C * x )^D ] \n" )
+        for name, val in zip( par, all_opt_params[ best_sample ] ):
+          my_f.write( f"{name}  {val} \n" ) 
+        #print("Optimized Parameters:", result.x)
+        my_f.write( f'Logarithmic Derivative at midpoint (superselectivity parameter): {alpha} \n' )
+        my_f.write( f'Onset for best solution at x = {onset} \n' )
+        my_f.write( f'AVERAGE onset found at x = {average_onset} \n' )
+        my_f.write( f'ERROR on average onset: {error_onset} \n' )
+        my_f.write( f"Residual on the logarithm: {minimum_loss} \n" ) 
+      elif function_type == "constant":
+        my_f.write( "Intensity approximated with constant fitting function f(x) = A \n" )
+        my_f.write( f"A {all_opt_params[ best_sample ][ 0 ]} \n" ) 
+        my_f.write( f"Residual on the logarithm: {minimum_loss} \n" )
+
+    return 
