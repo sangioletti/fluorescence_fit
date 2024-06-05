@@ -52,11 +52,10 @@ def find_middle( x, a, b, c, d, e ):
     and x0 the mid point defined by "middle"'''
     return np.log( sample_function( x, a, b, c, d, e ) ) - middle( x, a, b, c, d, e )
 
-def find_onset( x, y_value_min, b, alpha ):
+def onset_value( x, y_value_min, b, alpha ):
     return np.log( b * x**alpha ) - np.log( y_value_min )
-
     
-def geometric_onset( x_data, y_data, opt_params, verbose = False ):
+def geometric_onset_from_fit( x_data, y_data, opt_params, verbose = False ):
     '''This function simply take the input experimental data and the parameters of the fitted model
     and use it to calculate the onset of adsorption'''
     # Find mid point between max and minimum in logarithmic space and calculate the logarithmic derivative 
@@ -80,10 +79,10 @@ def geometric_onset( x_data, y_data, opt_params, verbose = False ):
     y0 = np.exp(1)**( log_mid_point )  # y value of the mid point
     b_coeff = y0 / (root**alpha)
     #y_derivative = b_coeff * x_data**alpha 
-    args_find_onset = ( y_value_min, b_coeff, alpha )
+    args_onset_value = ( y_value_min, b_coeff, alpha )
 
     #Find onset using bisection method
-    onset = scipy.optimize.bisect( find_onset, 0, np.max( x_data), args = args_find_onset )
+    onset = scipy.optimize.bisect( onset_value, 0, np.max( x_data), args = args_onset_value )
     if verbose:
       print( f'x value corresponding to the mid point between max and min fluorescence on log-log plot = {root}' )
       print( f'y value for the midpoint is {y0}' )
@@ -153,7 +152,7 @@ def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, f
       all_opt_params[ i, :-5 ] = result.x
 
       if function_type == "multivalent" and onset_fitting:
-          onset, b_coeff, alpha, y0, y_min_value = geometric_onset( x_data, y_data, 
+          onset, b_coeff, alpha, y0, y_min_value = geometric_onset_from_fit( x_data, y_data, 
                                                                     all_opt_params[ i, :-5 ], 
                                                                     verbose = verbose )
           all_opt_params[ i, -1 ] = onset
@@ -163,7 +162,6 @@ def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, f
           all_opt_params[ i, -5 ] = y_min_value
 
     return x_data, y_data, all_opt_params, weights, best_sample, minimum_loss
-
 
 
 def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess, 
@@ -176,7 +174,7 @@ def calculate_onset( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
                    output = output, graph_name = graph_name, verbose = verbose,
                   same_scale = same_scale, mc_runs = mc_runs, n_hopping = n_hopping, T_hopping = T_hopping )
 
-    onset, b_coeff, alpha, y0, y_min_value = geometric_onset( x_data, y_data, 
+    onset, b_coeff, alpha, y0, y_min_value = geometric_onset_from_fit( x_data, y_data, 
                                                               all_opt_params[ i, :-5 ], 
                                                               verbose = verbose 
                                                              )
