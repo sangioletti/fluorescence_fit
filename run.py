@@ -1,6 +1,6 @@
 import sys
-#sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
-sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/sandbox" )
+sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
+#sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/sandbox" )
 from theory import sample_function, find_best_fit, calculate_onset_stat, plot_fitted_curve 
 from theory_model_comparison import bayes_model_vs_uniform
 # Change the line belows to import data from the correct excel files and their internal pages
