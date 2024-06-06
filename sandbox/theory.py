@@ -202,20 +202,21 @@ def full_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
 
     plot_fitted_curve( x_data, y_data, all_opt_params, weights, best_sample, 
                    function_type = "multivalent", onset_fitting = True, 
-		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False
-		   same_scale = False ):
+		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
+		   same_scale = False )
     
     ##Now average the onset and save the data
     if function_type == 'multivalent':
       calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, 
    		   output = 'output.txt', verbose = False,
-                   save_data = True ):
+                   save_data = True )
 
     return
 
-def plot_fitted_curve( x_data, y_data, all_opt_params, onset_coeffs, best_sample, 
-                   function_type = "multivalent", onset_fitting = True, 
-		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False
+def plot_fitted_curve( x_data, y_data, all_opt_params, 
+                   onset_coeffs, best_sample, 
+                   function_type = "multivalent", 
+		   graph_name = 'LogLog.pdf', verbose = False,
 		   same_scale = False ):
 
     ''''Take results of fitting and plot it'''
