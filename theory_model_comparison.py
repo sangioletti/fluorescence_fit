@@ -5,17 +5,19 @@ import matplotlib.pyplot as plt
 def no_signal( x, a ):
     return a 
 
-def bayes_model_vs_uniform( model, model_variance,model_parameters, parameters_bounds,  
-                            constant_variance, constant_parameters, constant_bounds, 
-                            x_data, y_data, prior = 'uniform', verbose = False,
+def bayes_model_vs_uniform( data_variance, model, model_parameters, parameters_bounds,  
+                            constant_parameters, constant_bounds, 
+                            x_data, y_data, prior = 'uniform', verbose = False, logarithmic = True,
                             eps = 10**(-5), n_blocks = 10, n_steps = 10**4, max_step = 10**7, 
                             ):
 
   #Calculate and then compare the (unnormalised) probability that the model is correct, given the data. Because normalisation constant
   #is the same = P( data ) prior probability of the data, the ratio of the unnormalised probability defines the most probable model
-  model_posterior = model_evidence( model, model_variance, model_parameters, parameters_bounds, x_data, y_data, prior = 'uniform', verbose = verbose,
+  model_posterior = model_evidence( model, data_variance, model_parameters, parameters_bounds, x_data, y_data, prior = 'uniform', 
+                 logarithmic = logarithmic, verbose = verbose,
                  eps = eps, n_blocks = n_blocks, n_steps = n_steps, max_step = max_step )
-  uniform_posterior = model_evidence( no_signal, constant_variance, constant_parameters, constant_bounds, x_data, y_data, prior = 'uniform', verbose = verbose, 
+  uniform_posterior = model_evidence( no_signal, data_variance, constant_parameters, constant_bounds, x_data, y_data, prior = 'uniform',
+                 logarithmic = logarithmic,  verbose = verbose, 
                  eps = eps, n_blocks = n_blocks, n_steps = n_steps, max_step = max_step )
   
   bayes_coeff = model_posterior / uniform_posterior
@@ -23,32 +25,43 @@ def bayes_model_vs_uniform( model, model_variance,model_parameters, parameters_b
 
   return bayes_coeff, model_valid
 
-def gaussian_likelyhood( model, sigma2, parameters, x_data, y_data, verbose = False ):
-  '''Calculate the likelyhood of the data given a model and its parameters'''
-  y_model = model( x_data, **parameters )
-  log_prefactor = len( x_data ) * np.log( 1.0 / np.sqrt( 2 * np.pi * sigma2 ) )
+def gaussian_likelyhood( model, sigma2, parameters, x_data, y_data, logarithmic = True, verbose = False ):
+  '''Calculate the likelyhood of the data given a model and its parameters.
+  If logarithmic == True it assumes that the error sigma2 is the variance obtained when fitting
+  the logarithm of the data instead of the data itself. This has nothing to do with using later the 
+  log of the likelyhood, which is done simply to handle a larger range of values
+  '''
+  if logarithmic:
+    y_model = np.log( model( x_data, **parameters ) )
+    y_data = np.log( y_data )
+  
+  #This part is useless so I remove it
+  #log_prefactor = len( x_data ) * np.log( 1.0 / np.sqrt( 2 * np.pi * sigma2 ) )
   dy2 = -( ( y_model - y_data )**2 / ( 2 * sigma2 ) )
-  log_likelyhood = log_prefactor + dy2.sum() 
+  #log_likelyhood = log_prefactor + dy2.sum() 
+  #log_likelyhood = dy2.sum() 
+  log_likelyhood = np.mean( dy2 )
   if verbose:
     print( f"Parameters {parameters}" )
     print( f"x in input before likelyhood {x_data}" ) 
     print( f"y_model {y_model}" )
+    print( f"sigma2 {sigma2}" )
     print( f"y_data {y_data}" )
     print( f"dy2 {dy2}" )
     print( f"log of the likelyhood {log_likelyhood}" )
   
   return np.exp( log_likelyhood )
 
-def model_evidence( model, sigma2, model_parameters, parameters_bounds, x_data, y_data, prior = 'uniform', verbose = False,
+def model_evidence( model, sigma2, model_parameters, parameters_bounds, x_data, y_data, prior = 'uniform', logarithmic = True, verbose = False,
                     eps = 10**(-5), n_blocks = 10, n_steps = 10**4, max_step = 10**7 ):
   assert prior == "uniform", AssertionError( "Only flat priors implemented, check function to generate random sample" )
-  result = mc_integral( model, sigma2, model_parameters, parameters_bounds, x_data, y_data, 
+  result = mc_integral( model, sigma2, model_parameters, parameters_bounds, x_data, y_data, logarithmic = logarithmic, 
                  eps = eps, n_blocks = n_blocks, n_steps = n_steps, max_step = max_step,
                  verbose = verbose 
                 )
   return result
 
-def mc_integral( model, sigma2, model_parameters, bounds, x_data, y_data, 
+def mc_integral( model, sigma2, model_parameters, bounds, x_data, y_data, logarithmic = True, 
                  eps = 10**(-3), n_blocks = 2, n_steps = 20, max_step = 10**4, verbose = False 
                 ):
   rng = np.random.default_rng()  # Create a random number generator
@@ -69,10 +82,13 @@ def mc_integral( model, sigma2, model_parameters, bounds, x_data, y_data,
                                                                                model_parameters, 
                                                                                bounds, 
                                                                                x_data, y_data,
-                                                                               rng.uniform
+                                                                               rng.uniform, 
+                                                                               logarithmic = logarithmic
                                                                               )
+
     count += 1
     mean_over_steps = np.mean( estimate, axis = 1 )
+    print( f"Mean over steps is: {mean_over_steps}" )
     mean_over_blocks = np.mean( mean_over_steps ) 
     var = np.var( mean_over_blocks , dtype=np.float32 )
 
@@ -105,14 +121,14 @@ def mc_integral( model, sigma2, model_parameters, bounds, x_data, y_data,
 
   return result 
 
-def generate_random_sample( model, sigma2, model_parameters, bounds, x_data, y_data, rng ):
+def generate_random_sample( model, sigma2, model_parameters, bounds, x_data, y_data, rng, logarithmic = True ):
     #Generate a random sample for the model parameters, assuming a flat/uniform distribution
     #within the hyper-cube defined by bounds. To be used later for MC integration
     parameters = {}
     for i, value in enumerate( model_parameters.keys() ):
       #Pick a value for the parameter within the bounds
       parameters[ value ] = rng( low = np.min( bounds[ i ] ), high = np.max( bounds[ i ] ), size = 1 )
-    sample = gaussian_likelyhood( model, sigma2, parameters, x_data, y_data )
+    sample = gaussian_likelyhood( model, sigma2, parameters, x_data, y_data, logarithmic = logarithmic )
 
     #Now we are assuming here uniform priors, in which case you have that p( theta ) = prod_i 1/L_i
     #where is the length of the interval for parameter "i"
@@ -153,21 +169,23 @@ if __name__ == "__main__":
     #Now calculated evidence for model
     bounds = [ ( -4, 4 ), ( -4, 4 ) ] 
   
-    first_estimate = gaussian_likelyhood( model, noise_scale, parameters, x_data, y_data, verbose = verbose )
+    first_estimate = gaussian_likelyhood( model, noise_scale, parameters, x_data, y_data, verbose = verbose, logarithmic = False)
     print( f"Gaussian likelyhood of data with exact parameters {first_estimate}" )
     evidence = model_evidence( model, sigma2 = noise_scale, model_parameters = parameters, 
              parameters_bounds = bounds, 
                x_data = x_data, 
-               y_data = y_data 
+               y_data = y_data,
+               logarithmic = logarithmic 
                )
     print( f"Evidence for model1: {evidence}" )
 
-    first_estimate = gaussian_likelyhood( model2, noise_scale, parameters, x_data, y_data, verbose = verbose )
+    first_estimate = gaussian_likelyhood( model2, noise_scale, parameters, x_data, y_data, verbose = verbose, logarithmic = False) 
     print( f"Gaussian likelyhood of data with exact parameters, CONSTANT MODEL {first_estimate}" )
     evidence = model_evidence( model2, sigma2 = noise_scale, model_parameters = parameters, 
                parameters_bounds = bounds, 
                x_data = x_data, 
-               y_data = y_data 
+               y_data = y_data, 
+               logarithmic = logarithmic 
                )
     print( f"Evidence for model2: {evidence}" )
 

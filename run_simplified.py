@@ -1,8 +1,9 @@
 import sys
+import numpy as np
 sys.path.append( "/Users/sangiole/Github-repos/fluorescence_fit/" )
 #sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
 #sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/sandbox" )
-from theory import sample_function, find_best_fit, calculate_onset_stat, plot_fitted_curve, extract_and_clean_data 
+from theory import sample_function, sample_constant, find_best_fit, calculate_onset_stat, plot_fitted_curve, extract_and_clean_data, model_variance 
 from theory_model_comparison import bayes_model_vs_uniform
 # Change the line belows to import data from the correct excel files and their internal pages
 my_file = "Expt 10 IgM+ only IgG-dextran.xlsx"
@@ -10,13 +11,13 @@ x_name = 'bv421 IgM'
 y_name = 'pe Klickmer'
 sheet_names = [ 
                 'P1 ancestor', 
-                #'P1 mutated', 
-                #'P2 ancestor', 
-                #'P2 mutated', 
-                #'P3 ancestor', 
+                'P1 mutated', 
+                'P2 ancestor', 
+                'P2 mutated', 
+                'P3 ancestor', 
                 'P3 mutated', 
                 'P4 ancestor', 
-                #'P4 mutated', 
+                'P4 mutated', 
                  ] 
 
 print( f"""This code takes the data from '{my_file}', specifically, from the sheets '{sheet_names}'
@@ -66,7 +67,16 @@ for name in sheet_names:
   n_steps = 10**4 
   max_step = 10**5 
 
-  x_data, y_data = extract_and_clean_data( my_file, name, x_name, y_name )
+  x_data_all, y_data_all = extract_and_clean_data( my_file, name, x_name, y_name )
+
+  # Now extract half of the data for the fitting, later use the other half to see how a model
+  # fitted on one part then can reproduce the other.
+  condition = np.random.randint( low = 0, high = 2, size = len( x_data_all ) ) 
+  x_data = np.extract( condition, x_data_all )
+  y_data = np.extract( condition, y_data_all )
+  x_data2 = np.extract( np.logical_not( condition ), x_data_all )
+  y_data2 = np.extract( np.logical_not( condition ), y_data_all )
+
 
   print( "Try fitting model where signal is assumed to exist" )
   #First try to fit a model where there should be a signal present
@@ -103,30 +113,23 @@ for name in sheet_names:
                                                                                     T_hopping = T_hopping )
   best_param_constant = {} 
   best_param_constant[ "a" ] = all_opt_params_const[ best_sample_const ][ 0 ]
-  
-  #Take as the variance of the data the minimum between that calculated with the two models  
-  data_variance = min( minimum_loss, minimum_loss_const )
-
+  #Note: the following are not used and have no meaning but needed just because of how this has been coded...
+  best_param_constant[ "b" ] = all_opt_params_const[ best_sample_const ][ 1 ]
+  best_param_constant[ "c" ] = all_opt_params_const[ best_sample_const ][ 2 ]
+  best_param_constant[ "d" ] = all_opt_params_const[ best_sample_const ][ 3 ]
+  best_param_constant[ "e" ] = all_opt_params_const[ best_sample_const ][ 4 ]
   print( f"Loss for constant model is: {minimum_loss_const}" )
 
+  # Calculate the variance of the fitted model on the other half of the data
+  variance_model = model_variance( x_data2, y_data2, model = sample_function, params = best_param_multivalent, logarithmic = True ) 
+  variance_constant = model_variance( x_data2, y_data2, model = sample_constant, params = best_param_constant, logarithmic = True ) 
 
-  #Estimate if model assuming binding exist is better than model with no binding
-  bayes_factor, signal_present = bayes_model_vs_uniform( 
-                                                         data_variance = data_variance, 
-                                                         model = sample_function, 
-                                                         model_parameters = best_param_multivalent, 
-                                                         parameters_bounds = bounds,
-                                                         constant_parameters = best_param_constant, 
-                                                         constant_bounds = [ bounds[ 0 ] ],
-							 x_data = x_data, 
-                                                         y_data = y_data, 
-                                                         prior = 'uniform', 
-                                                         verbose = True, 
-                                                         eps = eps, 
-                                                         n_blocks = n_blocks, 
-                                                         n_steps = n_steps, 
-                                                         max_step = max_step 
-                                                         )
+  if variance_model < variance_constant:
+    signal_present = True
+  else:
+    signal_present = False
+
+  print( f"Signal encountered: variance for multivalent model : {variance_model}, variance for constant model {variance_constant}" )
 
   if signal_present:
     function_type = "multivalent"
@@ -162,4 +165,3 @@ for name in sheet_names:
                    same_scale = False )
 
   print( f"Most likely model is {function_type}" )
-  quit()

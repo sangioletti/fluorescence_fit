@@ -36,6 +36,15 @@ def logarithmic_derivative( x, a, b, c, d, e ):
     der_sample = b * c * d * e * ( 1.0 + c * x )**(d-1.0) / (1.0 + e * (1.0 + c* x)**d )**2
     y = sample_function( x,a,b,c,d,e) 
     return x/y * der_sample
+    
+def model_variance( x_data, y_data, model, params, logarithmic = True ):
+    '''Calculate the model variance with respect to experimental data'''
+    if logarithmic:
+      result = np.mean( (np.log( y_data ) - np.log( model(x_data, **params)))**2 ) 
+    else: 
+      result = np.mean( ( y_data - model( x_data, **params))**2 ) 
+    return result
+
 
 def middle( x, a, b, c, d, e ):
     '''Average between the maximum and minimum value of the logarithm  
@@ -90,12 +99,9 @@ def calculate_onset_from_fit( x_data, y_data, opt_params, verbose = False ):
       print( f"Onset found at {onset}" )
 
     return onset, b_coeff, alpha, y0, y_value_min
-    
-def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, function_type = "multivalent",
-                   onset_fitting = False,
-                   verbose = False,
-                   mc_runs = 8, n_hopping = 2000, T_hopping = 3 ):
 
+
+def extract_and_clean_data( my_file, sheet_name, x_name, y_name ):
     data = pd.read_excel( my_file, sheet_name = sheet_name )
     x_data = data[x_name].values  
     y_data = data[y_name].values
@@ -105,6 +111,15 @@ def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, f
     condition = y_data > 0.0
     x_data = np.extract( condition, x_data ) 
     y_data = np.extract( condition, y_data )
+
+    return x_data, y_data
+
+    
+def find_best_fit( x_data, y_data, bounds, initial_guess, function_type = "multivalent",
+                   onset_fitting = False,
+                   verbose = False,
+                   mc_runs = 8, n_hopping = 2000, T_hopping = 3 ):
+
 
     #Redefine bound on parameter B to be slightly higher than max_y if needed
     if bounds[ 1 ][ 1 ] < np.max( y_data ):
@@ -161,16 +176,16 @@ def find_best_fit( my_file, sheet_name, x_name, y_name, bounds, initial_guess, f
           all_opt_params[ i, -4 ] = y0
           all_opt_params[ i, -5 ] = y_min_value
 
-    return x_data, y_data, all_opt_params, weights, best_sample, minimum_loss
+    return all_opt_params, weights, best_sample, minimum_loss
 
 
-def calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, 
+def calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, minimum_loss, 
 		   output = 'output.txt', verbose = False,
                    save_data = True ):
     
     ave_opt_params = np.average( all_opt_params, axis = 0, weights = weights ) 
     error_onset = np.sqrt( np.var( all_opt_params[ -1 ], axis = 0 ) ) 
-    average_onset = opt_params[ -1 ]
+    average_onset = ave_opt_params[ -1 ]
     
     best_onset_coeffs = {}  
     best_onset_coeffs[ 'onset' ] = all_opt_params[ best_sample, -1 ]
@@ -182,7 +197,8 @@ def calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample,
     if save_data:
     #Save fitting data to file and calculate averages of the fits found during MC procedure
 
-      save_fit_data( all_opt_params, opt_params, error_onset, average_onset, best_onset_coeffs, 
+      save_fit_data( all_opt_params, best_sample, error_onset, average_onset, best_onset_coeffs,
+                   minimum_loss, 
                    function_type = "multivalent",
 		   output = output, verbose = False )
 
@@ -194,9 +210,10 @@ def full_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
 		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
 		   same_scale = False, mc_runs = 8, n_hopping = 2000, T_hopping = 3, save_data = True ):
     ''''Does both fitting of the curve, calculate the onset and plot the graphs'''
+    x_data, y_data = extract_and_clean_data( my_file, sheet_name, x_name, y_name )
 
-    x_data, y_data, all_opt_params, weights, best_sample, minimum_loss = find_best_fit( my_file, sheet_name, x_name, 
-                   y_name, bounds, initial_guess, function_type = function_type, onset_fitting = onset_fitting,
+    all_opt_params, weights, best_sample, minimum_loss = find_best_fit( x_data, y_data, 
+                   bounds, initial_guess, function_type = function_type, onset_fitting = onset_fitting,
                    output = output, graph_name = graph_name, verbose = verbose,
                    same_scale = same_scale, mc_runs = mc_runs, n_hopping = n_hopping, T_hopping = T_hopping )
 
@@ -207,7 +224,7 @@ def full_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
     
     ##Now average the onset and save the data
     if function_type == 'multivalent':
-      calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, 
+      calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, minimum_loss, 
    		   output = 'output.txt', verbose = False,
                    save_data = True )
 
@@ -218,6 +235,9 @@ def plot_fitted_curve( x_data, y_data, all_opt_params,
                    function_type = "multivalent", 
 		   graph_name = 'LogLog.pdf', verbose = False,
 		   same_scale = False ):
+    
+    #Just a sanity check
+    assert function_type == 'multivalent' or function_type == 'constant', AssertionError( f"Function type not recognized {function_type}" )
 
     ''''Take results of fitting and plot it'''
 
@@ -277,7 +297,8 @@ def plot_fitted_curve( x_data, y_data, all_opt_params,
 
     return
 
-def save_fit_data( all_opt_params, opt_params, best_sample, error_onset, average_onset, onset_coeffs, 
+def save_fit_data( all_opt_params, best_sample, error_onset, average_onset, onset_coeffs, 
+                   minimum_loss, 
                    function_type = "multivalent",
 		   output = 'output.txt', verbose = False,
                    save = True ):
