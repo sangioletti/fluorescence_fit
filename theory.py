@@ -5,14 +5,17 @@ import matplotlib.pyplot as plt
 import scipy
 
 # Define the function to fit
-def sample_function( x, a, b, c, d, e):
+def sample_function( x, a, b, c, d, e ):
     '''This is the fitting function used to fit the fluorescence
     intensity signal as a function of "x", the number of IgM present on a cell
     surface'''
+    #print( f"x {x}" )
     if ( 1.0 + c * x ).any() <= 0 and d % 1 != 0:  
         print(f"Warning: Trying to compute a complex number with x={x} and exponent={b}")
+        raise ValueError("The value of c cannot be <0, so does x, so c*x must be positive always")
         return np.nan  # Return NaN or some other appropriate value
     p1 = ( 1.0 + c * x )**d
+    #print( f"p1 {p1}" )
     return a + b * e * p1 / ( 1.0 + e * p1 )
 
 def sample_constant( x, a, b, c, d, e ):
@@ -21,7 +24,7 @@ def sample_constant( x, a, b, c, d, e ):
     surface'''
     return np.ones( len(x) ) * a 
 
-def sample_log( x, a, b, c, d, e):
+def sample_log( x, a, b, c, d, e ):
     '''Just returns the logarithm of the sampling function'''
     return np.log( sample_function( x, a, b, c, d, e ) )
 

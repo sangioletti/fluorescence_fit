@@ -31,9 +31,14 @@ def gaussian_likelyhood( model, sigma2, parameters, x_data, y_data, logarithmic 
   the logarithm of the data instead of the data itself. This has nothing to do with using later the 
   log of the likelyhood, which is done simply to handle a larger range of values
   '''
+  print( f"x in input before likelyhood {x_data}" ) 
   if logarithmic:
     y_model = np.log( model( x_data, **parameters ) )
     y_data = np.log( y_data )
+  else:
+    y_model = model( x_data, **parameters ) 
+    y_data = y_data 
+  print( f"x in input before likelyhood {x_data}" ) 
   
   #This part is useless so I remove it
   #log_prefactor = len( x_data ) * np.log( 1.0 / np.sqrt( 2 * np.pi * sigma2 ) )
@@ -41,14 +46,14 @@ def gaussian_likelyhood( model, sigma2, parameters, x_data, y_data, logarithmic 
   #log_likelyhood = log_prefactor + dy2.sum() 
   #log_likelyhood = dy2.sum() 
   log_likelyhood = np.mean( dy2 )
-  if verbose:
-    print( f"Parameters {parameters}" )
-    print( f"x in input before likelyhood {x_data}" ) 
-    print( f"y_model {y_model}" )
-    print( f"sigma2 {sigma2}" )
-    print( f"y_data {y_data}" )
-    print( f"dy2 {dy2}" )
-    print( f"log of the likelyhood {log_likelyhood}" )
+  #if verbose:
+  print( f"Model: {model}" )
+  print( f"Parameters {parameters}" )
+  print( f"y_model[::20] {y_model[::20]}" )
+  print( f"sigma2 {sigma2}" )
+  print( f"y_data[::20] {y_data[::20]}" )
+  print( f"dy2[::20] {dy2[::20]}" )
+  print( f"log of the likelyhood {log_likelyhood}" )
   
   return np.exp( log_likelyhood )
 
