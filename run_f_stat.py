@@ -1,7 +1,7 @@
 import sys
 import numpy as np
-#sys.path.append( "/Users/sangiole/Github-repos/fluorescence_fit/" )
-sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
+sys.path.append( "/Users/sangiole/Github-repos/fluorescence_fit/" )
+#sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
 #sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/sandbox" )
 from theory import sample_function, sample_constant, find_best_fit, calculate_onset_stat, plot_fitted_curve, extract_and_clean_data, model_variance 
 from theory_model_comparison import bayes_model_vs_uniform
@@ -10,7 +10,11 @@ my_file = "Expt 10 IgM+ only IgG-dextran.xlsx"
 x_name = 'bv421 IgM'
 y_name = 'pe Klickmer'
 
+summary = open( "SUMMARY.txt", 'w+' )
+summary.write( f"Name of datafile = {my_file} \n" )
+
 logarithmic_fit = True
+p_for_significance = 0.05
 
 sheet_names = [ 
                 'P1 ancestor', 
@@ -28,8 +32,10 @@ print( f"""This code takes the data from '{my_file}', specifically, from the she
         the data using a formula related to multivalent binding. 
         (See details in the DETAILS.txt file)""" )
 
+
 for name in sheet_names:
   output_file = f'output_{name}.txt'
+  stat_file = f'stat_{name}.txt'
   output_graph = f'LogLog_{name}.pdf'
  
   # bounds (lower, upper) for the parameters inside the fitting function
@@ -60,8 +66,8 @@ for name in sheet_names:
   #Ok, so let's first fit the data so we obtain the variance around the best fit
   #mc_runs = 8 
   #n_hopping = 2000
-  mc_runs = 8 
-  n_hopping = 2000
+  mc_runs = 1 
+  n_hopping = 500
   T_hopping = 3
   
   #Parameter for bayes sampling                                                       
@@ -72,40 +78,33 @@ for name in sheet_names:
 
   x_data_all, y_data_all = extract_and_clean_data( my_file, name, x_name, y_name )
 
-  # Now extract half of the data for the fitting, later use the other half to see how a model
-  # fitted on one part then can reproduce the other.
-  condition = np.random.randint( low = 0, high = 2, size = len( x_data_all ) ) 
-  x_data = np.extract( condition, x_data_all )
-  y_data = np.extract( condition, y_data_all )
-  x_data2 = np.extract( np.logical_not( condition ), x_data_all )
-  y_data2 = np.extract( np.logical_not( condition ), y_data_all )
-
-
   print( "Try fitting model where signal is assumed to exist" )
   #First try to fit a model where there should be a signal present
 
 
-  all_opt_params, weights, best_sample, minimum_loss = find_best_fit( x_data, y_data, 
-                                                                                    bounds = bounds, 
-                                                                                    initial_guess = initial_guess, 
-                                                                                    function_type = "multivalent",
-                                                                                    onset_fitting = False,
-                                                                                    verbose = False,
-                                                                                    mc_runs = mc_runs, 
-                                                                                    n_hopping = n_hopping, 
-                                                                                    T_hopping = T_hopping )
+  all_opt_params, weights, best_sample, minimum_loss = find_best_fit( 
+                                                                      x_data = x_data_all, 
+                                                                      y_data = y_data_all, 
+                                                                      bounds = bounds, 
+                                                                      initial_guess = initial_guess, 
+                                                                      function_type = "multivalent",
+                                                                      onset_fitting = False,
+                                                                      verbose = False,
+                                                                      mc_runs = mc_runs, 
+                                                                      n_hopping = n_hopping, 
+                                                                      T_hopping = T_hopping )
   best_param_multivalent = {} 
   best_param_multivalent[ "a" ] = all_opt_params[ best_sample ][ 0 ]
   best_param_multivalent[ "b" ] = all_opt_params[ best_sample ][ 1 ]
   best_param_multivalent[ "c" ] = all_opt_params[ best_sample ][ 2 ]
   best_param_multivalent[ "d" ] = all_opt_params[ best_sample ][ 3 ]
   best_param_multivalent[ "e" ] = all_opt_params[ best_sample ][ 4 ]
-
-  print( f"Loss for model is: {minimum_loss}" )
   
   print( f"Try fitting model where NO signal is assumed (constant)" )
   #Next, assume a model where there is no signal
-  all_opt_params_const, weights_const, best_sample_const, minimum_loss_const = find_best_fit( x_data, y_data, 
+  all_opt_params_const, weights_const, best_sample_const, minimum_loss_const = find_best_fit( 
+                                                                                    x_data = x_data_all, 
+                                                                                    y_data = y_data_all, 
                                                                                     bounds = bounds, 
                                                                                     initial_guess = initial_guess, 
                                                                                     function_type = "constant",
@@ -116,42 +115,48 @@ for name in sheet_names:
                                                                                     T_hopping = T_hopping )
   best_param_constant = {} 
   best_param_constant[ "a" ] = all_opt_params_const[ best_sample_const ][ 0 ]
-  #Note: the following are not used and have no meaning but needed just because of how this has been coded...
-  best_param_constant[ "b" ] = all_opt_params_const[ best_sample_const ][ 1 ]
-  best_param_constant[ "c" ] = all_opt_params_const[ best_sample_const ][ 2 ]
-  best_param_constant[ "d" ] = all_opt_params_const[ best_sample_const ][ 3 ]
-  best_param_constant[ "e" ] = all_opt_params_const[ best_sample_const ][ 4 ]
-  print( f"Loss for constant model is: {minimum_loss_const}" )
 
-  # Calculate the variance of the fitted model on the other half of the data
-  variance_model = model_variance( x_data2, y_data2, model = sample_function, params = best_param_multivalent, logarithmic = logarithmic_fit ) 
-  variance_constant = model_variance( x_data2, y_data2, model = sample_constant, params = best_param_constant, logarithmic = logarithmic_fit ) 
+  # Calculate the f-statistic of the model and from that the p_value. Uses p_min to decide if the test is passed or not
+  p_value, test_passed = compare_models_using_p_value( func1 = sample_function, 
+                                                       params1 = best_param_multivalent, 
+                                                       func2 = no_signal, 
+                                                       params2 = best_param_constant, 
+                                                       x_data = x_data_all, 
+                                                       y_data = y_data_all, 
+                                                       p_min = p_for_significance, 
+                                                       logarithmic = logarithmic_fit 
+                                                      )
 
-  if variance_model < variance_constant:
-    signal_present = True
-  else:
-    signal_present = False
+  # This is a bit redundant but I put it for clarity
+  signal_present = test_passed
 
-  print( f"Signal encountered: variance for multivalent model : {variance_model}, variance for constant model {variance_constant}" )
+  print( f"Signal encountered: calculated f_statistics = {f_stat}, p_value = {p_value}, p used for significance {p_for_significance}" )
+  #Ok, now also save this data
+  with open( stat_file, 'w+' ) as my_f:
+    my_f.write( f"Complex model is a better representation? {signal_present} \n" )
+    my_f.write( f"calculated f_statistics: {f_stat} \n" )
+    my_f.write( f"calculated p_value: {p_value} \n" )
+    my_f.write( f"p used for significance: {p_for_significance} \n" )
 
   if signal_present:
     function_type = "multivalent"
     tag = ""
     # In this case, save, model predict there is a signal and saves data for the onset
-    ave_opt_params, error_onset, average_onset, best_onset_coeffs =  calculate_onset_stat( x_data, 
-                                                  y_data, 
+    ave_opt_params, error_onset, average_onset, best_onset_coeffs =  calculate_onset_stat( x_data_all, 
+                                                  y_data_all, 
                                                   all_opt_params, 
                                                   weights, best_sample, minimum_loss, 
                                                   output = output_file, verbose = False, 
                                                   save_data = True )
 
-    plot_fitted_curve( x_data, y_data, all_opt_params, 
+    plot_fitted_curve( x_data_all, y_data_all, all_opt_params, 
                  best_sample = best_sample,
                  onset_coeffs = best_onset_coeffs, 
                  function_type = function_type, 
                  graph_name = output_graph, 
                  verbose = False,
                  same_scale = False )
+    onset_str = f"{best_onset_coeffs[ 'onset' ]}"
   else:
     function_type = "constant"
     output_graph = output_graph[:-4] #Remove the .pdf tag at the end so I can replace it
@@ -159,12 +164,17 @@ for name in sheet_names:
     best_onset_coeffs = {}
     # Plot the graph. Add Tag SIGNAL_NOT_DETECTED if the signal is undetectable = model assuming no binding better 
     # fits the data
-    plot_fitted_curve( x_data, y_data, all_opt_params_const, 
+    plot_fitted_curve( x_data_all, y_data_all, all_opt_params_const, 
                    best_sample = best_sample_const,
                    onset_coeffs = best_onset_coeffs, 
                    function_type = function_type, 
                    graph_name = output_graph + tag, 
                    verbose = False,
                    same_scale = False )
+    #Basically, all you can say is that onset should be larger than max value of x sampled
+    onset_str = f"> {np.max( x_data_all )}"
 
-  print( f"Most likely model is {function_type}" )
+  
+  string = f"Data series: {name}, signal present: {signal_present}, calculated onset: {onset_str}" )
+  print( string ) 
+  summary.write(  string + "\n" )
