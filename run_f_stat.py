@@ -4,7 +4,8 @@ import numpy as np
 sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
 #sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/sandbox" )
 from theory import sample_function, sample_constant, find_best_fit, calculate_onset_stat, plot_fitted_curve, extract_and_clean_data, model_variance 
-from theory_model_comparison import bayes_model_vs_uniform
+from theory_model_comparison import bayes_model_vs_uniform, no_signal
+from theory_f_stat import compare_models_using_p_value
 # Change the line belows to import data from the correct excel files and their internal pages
 my_file = "Expt 10 IgM+ only IgG-dextran.xlsx"
 x_name = 'bv421 IgM'
@@ -117,7 +118,7 @@ for name in sheet_names:
   best_param_constant[ "a" ] = all_opt_params_const[ best_sample_const ][ 0 ]
 
   # Calculate the f-statistic of the model and from that the p_value. Uses p_min to decide if the test is passed or not
-  p_value, test_passed = compare_models_using_p_value( func1 = sample_function, 
+  f_stat, p_value, test_passed = compare_models_using_p_value( func1 = sample_function, 
                                                        params1 = best_param_multivalent, 
                                                        func2 = no_signal, 
                                                        params2 = best_param_constant, 

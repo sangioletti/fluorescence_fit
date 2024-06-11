@@ -89,7 +89,7 @@ for name in sheet_names:
                                                                                     bounds = bounds, 
                                                                                     initial_guess = initial_guess, 
                                                                                     function_type = "multivalent",
-                                                                                    onset_fitting = False,
+                                                                                    onset_fitting = True,
                                                                                     verbose = False,
                                                                                     mc_runs = mc_runs, 
                                                                                     n_hopping = n_hopping, 

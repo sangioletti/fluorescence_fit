@@ -104,9 +104,9 @@ def calculate_onset_from_fit( x_data, y_data, opt_params, verbose = False ):
 def extract_and_clean_data( my_file, sheet_name, x_name, y_name ):
     try:
       data = pd.read_excel( my_file, sheet_name = sheet_name )
-    except ParserError:
-      print( "Excel file not found, assuming csv" )
+    except:
       data = pd.read_csv( my_file )
+      print( "Excel file not found, assuming csv" )
 
     x_data = data[x_name].values  
     y_data = data[y_name].values

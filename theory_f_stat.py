@@ -91,4 +91,4 @@ def compare_models_using_p_value( func1, params1, func2, params2, x_data, y_data
 
     test_passed = p_value < p_min
 
-    return p_value, test_passed
+    return f_stat, p_value, test_passed
