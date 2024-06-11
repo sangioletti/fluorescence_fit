@@ -1,0 +1,2 @@
+Name of datafile = export_empty_P1 a_001_IgM+.csv 
+Data series: P1 ancestor, signal present: False, calculated onset: > 67909.6

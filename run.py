@@ -1,9 +1,10 @@
 import sys
-sys.path.append( "/Users/sangiole/Github-repos/fluorescence_fit/" )
-#sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
+#sys.path.append( "/Users/sangiole/Github-repos/fluorescence_fit/" )
+sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
 #sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/sandbox" )
 from theory import sample_function, find_best_fit, calculate_onset_stat, plot_fitted_curve, extract_and_clean_data 
 from theory_model_comparison import bayes_model_vs_uniform
+import numpy as np
 # Change the line belows to import data from the correct excel files and their internal pages
 my_file = "Expt 10 IgM+ only IgG-dextran.xlsx"
 x_name = 'bv421 IgM'
@@ -27,15 +28,15 @@ print( f"""This code takes the data from '{my_file}', specifically, from the she
 for name in sheet_names:
   output_file = f'output_{name}.txt'
   output_graph = f'LogLog_{name}.pdf'
- 
+
   # bounds (lower, upper) for the parameters inside the fitting function
-  bound_A = ( 0, 1000 )       # Defines the lower bound for the measured intensity
+  bound_A = ( 10**-10, 1000 )       # Defines the lower bound for the measured intensity
   bound_B = ( 1, 2 * 10**4 )  # Approximately defines the upper bound for the measured intensity
-  bound_C = ( 10**(-9), 1.0 ) # Approximately ( 1 /N_bind), where N_bind is the total number of binding sites on a cell. 
+  bound_C = ( 10**(-9), 10**(-3) ) # Approximately ( 1 /N_bind), where N_bind is the total number of binding sites on a cell. 
                         # Order of magnitude is A_construct / A_cell, where A_cell is the surface area of a cell and 
                         # A_construct the area occupied by a single construct  
-  bound_D = ( 1, 25 )         # Number of ligands per binding construct, lower bound always 1, upper bound depends on the construct itself      
-  bound_E = ( 10**(-9), 1.0 ) # Number concentration of binding construct times binding volume. Rule of thumb, binding volume is of the order
+  bound_D = ( 1, 12 )   # Number of ligands per binding construct, lower bound always 1, upper bound depends on the construct itself      
+  bound_E = ( 10**(-9), 10**( -3) ) # Number concentration of binding construct times binding volume. Rule of thumb, binding volume is of the order
                         # of the size of the construct, often ~nm^3 
 
   bounds = [ bound_A, bound_B, bound_C, bound_D, bound_E ]
@@ -57,7 +58,7 @@ for name in sheet_names:
   #mc_runs = 8 
   #n_hopping = 2000
   mc_runs = 1 
-  n_hopping = 500
+  n_hopping = 1000
   T_hopping = 3
   
   #Parameter for bayes sampling                                                       
@@ -110,7 +111,22 @@ for name in sheet_names:
   print( f"Loss for constant model is: {minimum_loss_const}" )
 
 
+  amax = np.max( bounds[ 0 ] ) 
+  bmax = np.max( bounds[ 1 ] ) 
+
+  amin = np.min( bounds[ 0 ] ) 
+  bmin = np.min( bounds[ 1 ] ) 
+
+  print( f"Max value for a = {amax}" )
+  print( f"Max value for b = {bmax}" )
+  print( f"Min value for a = {amin}" )
+  print( f"Min value for b = {bmin}" )
+
+  print( f"Max value for log(a+b) {np.log( amax + bmax )}" )
+  print( f"Min value for log(a+b) = log( a ) = {np.log( amin )}" )
+
   #Estimate if model assuming binding exist is better than model with no binding
+
   bayes_factor, signal_present = bayes_model_vs_uniform( 
                                                          data_variance = data_variance, 
                                                          model = sample_function, 
