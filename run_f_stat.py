@@ -1,7 +1,7 @@
 import sys
 import numpy as np
-sys.path.append( "/Users/sangiole/Github-repos/fluorescence_fit/" )
-#sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
+#sys.path.append( "/Users/sangiole/Github-repos/fluorescence_fit/" )
+sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
 #sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/sandbox" )
 from theory import sample_function, sample_constant, find_best_fit, calculate_onset_stat, plot_fitted_curve, extract_and_clean_data, model_variance 
 from theory_model_comparison import bayes_model_vs_uniform
@@ -64,10 +64,10 @@ for name in sheet_names:
   #sampled. In other words, the onset should be higher than the largest value of IgG present in the sampling data
 
   #Ok, so let's first fit the data so we obtain the variance around the best fit
-  #mc_runs = 8 
-  #n_hopping = 2000
-  mc_runs = 1 
-  n_hopping = 500
+  mc_runs = 8 
+  n_hopping = 2000
+  #mc_runs = 1 
+  #n_hopping = 500
   T_hopping = 3
   
   #Parameter for bayes sampling                                                       
@@ -175,6 +175,6 @@ for name in sheet_names:
     onset_str = f"> {np.max( x_data_all )}"
 
   
-  string = f"Data series: {name}, signal present: {signal_present}, calculated onset: {onset_str}" )
+  string = f"Data series: {name}, signal present: {signal_present}, calculated onset: {onset_str}" 
   print( string ) 
   summary.write(  string + "\n" )
