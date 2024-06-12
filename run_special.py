@@ -2,9 +2,12 @@ import sys
 sys.path.append( "/Users/sangiole/Github-repos/fluorescence_fit/" )
 #sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" )
 #sys.path.append( "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit/sandbox" )
-from theory import sample_function, find_best_fit, calculate_onset_stat, plot_fitted_curve, extract_and_clean_data 
-from theory_model_comparison import bayes_model_vs_uniform
+from theory import sample_function, find_best_fit, calculate_onset_stat, plot_fitted_curve, extract_and_clean_data, sample_constant 
+from theory_model_comparison import bayes_model_vs_uniform, no_signal
 import numpy as np
+from special_integrate import average_likelyhood_over_grid
+
+
 # Change the line belows to import data from the correct excel files and their internal pages
 my_file = "Expt 10 IgM+ only IgG-dextran.xlsx"
 x_name = 'bv421 IgM'
@@ -15,8 +18,8 @@ sheet_names = [
                 #'P2 ancestor', 
                 #'P2 mutated', 
                 #'P3 ancestor', 
-                'P3 mutated', 
-                'P4 ancestor', 
+                #'P3 mutated', 
+                #'P4 ancestor', 
                 #'P4 mutated', 
                  ] 
 
@@ -124,72 +127,72 @@ for name in sheet_names:
   print( f"Loss for constant model is: {minimum_loss_const}" )
 
 
-  amax = np.max( bounds[ 0 ] ) 
-  bmax = np.max( bounds[ 1 ] ) 
-
-  amin = np.min( bounds[ 0 ] ) 
-  bmin = np.min( bounds[ 1 ] ) 
-
-  print( f"Max value for a = {amax}" )
-  print( f"Max value for b = {bmax}" )
-  print( f"Min value for a = {amin}" )
-  print( f"Min value for b = {bmin}" )
-
-  print( f"Max value for log(a+b) {np.log( amax + bmax )}" )
-  print( f"Min value for log(a+b) = log( a ) = {np.log( amin )}" )
-
   #Estimate if model assuming binding exist is better than model with no binding
 
-  bayes_factor, signal_present = bayes_model_vs_uniform( 
-                                                         data_variance = data_variance, 
-                                                         model = sample_function, 
-                                                         model_parameters = best_param_multivalent, 
-                                                         parameters_bounds = bounds,
-                                                         constant_parameters = best_param_constant, 
-                                                         constant_bounds = [ bounds[ 0 ] ],
-							 x_data = x_data, 
-                                                         y_data = y_data, 
-                                                         prior = 'uniform', 
-                                                         verbose = True, 
-                                                         eps = eps, 
-                                                         n_blocks = n_blocks, 
-                                                         n_steps = n_steps, 
-                                                         max_step = max_step,
-                                                         integral_on_grid = True, 
-                                                         )
+  print( f"Max number of experimental data points: {len(x_data)}" )
 
-  if signal_present:
-    function_type = "multivalent"
-    tag = ""
-    # In this case, save, model predict there is a signal and saves data for the onset
-    ave_opt_params, error_onset, average_onset, best_onset_coeffs =  calculate_onset_stat( x_data, 
-                                                  y_data, 
-                                                  all_opt_params, 
-                                                  weights, best_sample, minimum_loss, 
-                                                  output = output_file, verbose = False, 
-                                                  save_data = True )
+  for choose_every in [ 10, 5, 2, 1 ]:
+    
+    xx_data = x_data[::choose_every]
+    yy_data = y_data[::choose_every]
 
-    plot_fitted_curve( x_data, y_data, all_opt_params, 
-                 best_sample = best_sample,
-                 onset_coeffs = best_onset_coeffs, 
-                 function_type = function_type, 
-                 graph_name = output_graph, 
-                 verbose = False,
-                 same_scale = False )
-  else:
-    function_type = "constant"
-    output_graph = output_graph[:-4] #Remove the .pdf tag at the end so I can replace it
-    tag = "_SIGNAL_NOT_DETECTED.pdf"
-    best_onset_coeffs = {}
-    # Plot the graph. Add Tag SIGNAL_NOT_DETECTED if the signal is undetectable = model assuming no binding better 
-    # fits the data
-    plot_fitted_curve( x_data, y_data, all_opt_params_const, 
-                   best_sample = best_sample_const,
-                   onset_coeffs = best_onset_coeffs, 
-                   function_type = function_type, 
-                   graph_name = output_graph + tag, 
-                   verbose = False,
-                   same_scale = False )
+    print( f"Experimental data points extracted {len(xx_data)}" )
 
-  print( f"Most likely model is {function_type}" )
-  quit()
+    for n1 in [ 5, 10 ]:
+
+      print( f"Sampling points = {n1**5}" )
+      res_multivalent = average_likelyhood_over_grid( model = sample_function, 
+                                sigma2 = data_variance, 
+                                par = best_param_multivalent, 
+                                x_data = xx_data, 
+                                y_data = yy_data, 
+                                bounds = bounds, 
+                                n_points = tuple( [n1] * 5 )
+                              )
+
+      print( "CONSTANT_MODEL" ) 
+      res_constant = average_likelyhood_over_grid( model = sample_constant, 
+                                sigma2 = data_variance, 
+                                par = best_param_constant, 
+                                x_data = xx_data, 
+                                y_data = yy_data, 
+                                bounds = bounds, 
+                                n_points = tuple( [n1] * 5 )
+                              )
+      print( f"Average likelyhood: multivalent = {res_multivalent}, constant = {res_constant}" )
+
+  #if signal_present:
+  #  function_type = "multivalent"
+  #  tag = ""
+  #  # In this case, save, model predict there is a signal and saves data for the onset
+  #  ave_opt_params, error_onset, average_onset, best_onset_coeffs =  calculate_onset_stat( x_data, 
+  #                                                y_data, 
+  #                                                all_opt_params, 
+  #                                                weights, best_sample, minimum_loss, 
+  #                                                output = output_file, verbose = False, 
+  #                                                save_data = True )
+  #
+  #  plot_fitted_curve( x_data, y_data, all_opt_params, 
+  #               best_sample = best_sample,
+  #               onset_coeffs = best_onset_coeffs, 
+  #               function_type = function_type, 
+  #               graph_name = output_graph, 
+  #               verbose = False,
+  #               same_scale = False )
+  #else:
+  #  function_type = "constant"
+  #  output_graph = output_graph[:-4] #Remove the .pdf tag at the end so I can replace it
+  #  tag = "_SIGNAL_NOT_DETECTED.pdf"
+  #  best_onset_coeffs = {}
+  #  # Plot the graph. Add Tag SIGNAL_NOT_DETECTED if the signal is undetectable = model assuming no binding better 
+  #  # fits the data
+  #  plot_fitted_curve( x_data, y_data, all_opt_params_const, 
+  #                 best_sample = best_sample_const,
+  #                 onset_coeffs = best_onset_coeffs, 
+  #                 function_type = function_type, 
+  #                 graph_name = output_graph + tag, 
+  #                 verbose = False,
+  #                 same_scale = False )
+
+  #print( f"Most likely model is {function_type}" )
+  #quit()
