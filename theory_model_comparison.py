@@ -46,14 +46,14 @@ def gaussian_likelyhood( model, sigma2, parameters, x_data, y_data, logarithmic 
   #log_likelyhood = log_prefactor + dy2.sum() 
   #log_likelyhood = dy2.sum() 
   log_likelyhood = np.mean( dy2 )
-  #if verbose:
-  print( f"Parameters {parameters}" )
-  print( f"x in input before likelyhood {x_data[::20]}" ) 
-  print( f"y_data {y_data[::20]}" )
-  print( f"y_model {y_model[::20]}" )
-  print( f"sigma2 {sigma2}" )
-  print( f"dy2 {dy2[::20]}" )
-  print( f"log of the likelyhood {log_likelyhood}" )
+  if verbose:
+    print( f"Parameters {parameters}" )
+    print( f"x in input before likelyhood {x_data[::20]}" ) 
+    print( f"y_data {y_data[::20]}" )
+    print( f"y_model {y_model[::20]}" )
+    print( f"sigma2 {sigma2}" )
+    print( f"dy2 {dy2[::20]}" )
+    print( f"log of the likelyhood {log_likelyhood}" )
   
   return np.exp( log_likelyhood )
 
