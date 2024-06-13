@@ -1,5 +1,7 @@
 import tkinter as tk
-from fitting import run_fitting
+from with_gui_fitting_fstat import run_fitting
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 # Wrapper function to get input from GUI and run the actual function
 def run_function():
@@ -20,6 +22,7 @@ def run_function():
     bounds_E_value = eval(bounds_E.get())
     guess_E_value = eval(guess_E.get()) 
 
+    p_value = eval( p_value_significance.get() )
     mc_runs_value = eval( mc_runs.get() )
     n_hop_value = eval( n_hop.get() )
     temp_value = eval( temp.get() )
@@ -44,6 +47,7 @@ def run_function():
         mc_runs = mc_runs_value,
         n_hopping = n_hop_value,
         T_hopping = temp_value,
+        p_for_significance = p_value,
         verbose = verbosity_value,
     )
 
@@ -76,7 +80,7 @@ y_name.insert(0, "Y - binding signal")  # Default value
 tk.Label(root, text="Bounds for A value").pack()
 bounds_A = tk.Entry(root)
 bounds_A.pack()
-bounds_A.insert(0, "(0, 10**4)")  # Default value
+bounds_A.insert(0, "(0, 10**3)")  # Default value
 
 tk.Label(root, text="Initial gues for A value").pack()
 guess_A = tk.Entry(root)
@@ -86,7 +90,7 @@ guess_A.insert(0, "None")  # Default value
 tk.Label(root, text="Bounds for B value").pack()
 bounds_B = tk.Entry(root)
 bounds_B.pack()
-bounds_B.insert(0, "(0, 2 * 10**4)")  # Default value
+bounds_B.insert(0, "(0, 5 * 10**4)")  # Default value
 
 tk.Label(root, text="Initial gues for B value").pack()
 guess_B = tk.Entry(root)
@@ -122,6 +126,11 @@ tk.Label(root, text="Initial guess for E value").pack()
 guess_E = tk.Entry(root)
 guess_E.pack()
 guess_E.insert(0, "None")  # Default value
+
+tk.Label(root, text="p value chosen for statistical significance wrt no signal hypothesis").pack()
+p_value_significance = tk.Entry(root)
+p_value_significance.pack()
+p_value_significance.insert(0, "0.01")  # Default value
 
 tk.Label(root, text="Number of independent Monte Carlo runs").pack()
 mc_runs = tk.Entry(root)

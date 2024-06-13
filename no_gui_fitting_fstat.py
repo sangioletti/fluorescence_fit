@@ -54,7 +54,7 @@ p_for_significance = 0.05
 
 # bounds (lower, upper) for the parameters inside the fitting function
 bound_A = ( 0, 1000 )       # Defines the lower bound for the measured intensity
-bound_B = ( 1, 2 * 10**4 )  # Approximately defines the upper bound for the measured intensity
+bound_B = ( 1, 5 * 10**4 )  # Approximately defines the upper bound for the measured intensity
 bound_C = ( 10**(-9), 1.0 ) # Approximately ( 1 / (K_D/M) * N_bind), where N_bind is the total number of binding sites on a cell. 
                             # Order of magnitude is A_construct / A_cell, where A_cell is the surface area of a cell and 
                             # A_construct the area occupied by a single construct  

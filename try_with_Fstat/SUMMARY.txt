@@ -1,9 +1,0 @@
-Name of datafile = Expt 10 IgM+ only IgG-dextran.xlsx 
-Data series: P1 ancestor, signal present: True, calculated onset: 0.0
-Data series: P1 mutated, signal present: True, calculated onset: 0.0
-Data series: P2 ancestor, signal present: True, calculated onset: 0.0
-Data series: P2 mutated, signal present: True, calculated onset: 0.0
-Data series: P3 ancestor, signal present: True, calculated onset: 0.0
-Data series: P3 mutated, signal present: True, calculated onset: 0.0
-Data series: P4 ancestor, signal present: True, calculated onset: 0.0
-Data series: P4 mutated, signal present: True, calculated onset: 0.0

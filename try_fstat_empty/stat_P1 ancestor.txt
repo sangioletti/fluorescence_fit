@@ -1,4 +1,0 @@
-Complex model is a better representation? False 
-calculated f_statistics: 1.8610453535438225 
-calculated p_value: 0.11439580487295153 
-p used for significance: 0.05 
