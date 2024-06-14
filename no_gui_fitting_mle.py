@@ -90,81 +90,68 @@ for name in sheet_names:
   print( "Try fitting model where signal is assumed to exist" )
   #First try to fit a model where there should be a signal present
 
-  all_opt_params, weights, best_sample, minimum_loss = find_best_fit( 
-                                                                      x_data = x_data_all, 
-                                                                      y_data = y_data_all, 
-                                                                      bounds = bounds, 
-                                                                      initial_guess = initial_guess, 
-                                                                      function_type = "multivalent",
-                                                                      onset_fitting = True,
-                                                                      verbose = False,
-                                                                      mc_runs = mc_runs, 
-                                                                      n_hopping = n_hopping, 
-                                                                      T_hopping = T_hopping )
+  optimal_parameters, onset_parameters = find_best_fit_mle( x_data, y_data, 
+                   bounds, initial_guess, function_type = "multivalent",
+                   kernel = RBF(),
+                   alpha_gp =1e-10, # Small alpha for likelihood
+                   n_restarts_optimizer_gp = 10 
+                   onset_fitting = True,
+                   verbose = False )
+  
   best_param_multivalent = {} 
-  best_param_multivalent[ "a" ] = all_opt_params[ best_sample ][ 0 ]
-  best_param_multivalent[ "b" ] = all_opt_params[ best_sample ][ 1 ]
-  best_param_multivalent[ "c" ] = all_opt_params[ best_sample ][ 2 ]
-  best_param_multivalent[ "d" ] = all_opt_params[ best_sample ][ 3 ]
-  best_param_multivalent[ "e" ] = all_opt_params[ best_sample ][ 4 ]
+  best_param_multivalent[ "a" ] = optimal_parameters[ 0 ]
+  best_param_multivalent[ "b" ] = optimal_parameters[ 1 ]
+  best_param_multivalent[ "c" ] = optimal_parameters[ 2 ]
+  best_param_multivalent[ "d" ] = optimal_parameters[ 3 ]
+  best_param_multivalent[ "e" ] = optimal_parameters[ 4 ]
   
   print( f"Try fitting model where NO signal is assumed (constant)" )
   #Next, assume a model where there is no signal
-  all_opt_params_const, weights_const, best_sample_const, minimum_loss_const = find_best_fit( 
-                                                                                    x_data = x_data_all, 
-                                                                                    y_data = y_data_all, 
-                                                                                    bounds = bounds, 
-                                                                                    initial_guess = initial_guess, 
-                                                                                    function_type = "constant",
-                                                                                    onset_fitting = False,
-                                                                                    verbose = False,
-                                                                                    mc_runs = mc_runs, 
-                                                                                    n_hopping = n_hopping, 
-                                                                                    T_hopping = T_hopping )
-  best_param_constant = {} 
-  best_param_constant[ "a" ] = all_opt_params_const[ best_sample_const ][ 0 ]
+  optimal_parameters, onset_parameters = find_best_fit_mle( x_data, y_data, 
+                   bounds, initial_guess, function_type = "constant",
+                   kernel = RBF(),
+                   alpha_gp =1e-10, # Small alpha for likelihood
+                   n_restarts_optimizer_gp = 10 
+                   onset_fitting = False,
+                   verbose = False )
 
-  # Calculate the f-statistic of the model and from that the p_value. Uses p_min to decide if the test is passed or not
-  f_stat, p_value, test_passed = compare_models_using_p_value( func1 = sample_function, 
-                                                       params1 = best_param_multivalent, 
-                                                       func2 = no_signal, 
-                                                       params2 = best_param_constant, 
-                                                       x_data = x_data_all, 
-                                                       y_data = y_data_all, 
-                                                       p_min = p_for_significance, 
-                                                       logarithmic = logarithmic_fit 
-                                                      )
+  best_param_constant = {} 
+  best_param_constant[ "a" ] = optimal_parameters[ 0 ]
+
+  # Calculate Akaike information criterion to compare the two models
+
+  signal_present = False 
+  if delta_aic > 0:
+    signal_present = True
 
   # This is a bit redundant but I put it for clarity
   signal_present = test_passed
 
-  print( f"Signal encountered: calculated f_statistics = {f_stat}, p_value = {p_value}, p used for significance {p_for_significance}" )
+  print( f"Signal encountered" )
   #Ok, now also save this data
   with open( stat_file, 'w+' ) as my_f:
     my_f.write( f"Complex model is a better representation? {signal_present} \n" )
-    my_f.write( f"calculated f_statistics: {f_stat} \n" )
-    my_f.write( f"calculated p_value: {p_value} \n" )
-    my_f.write( f"p used for significance: {p_for_significance} \n" )
+    my_f.write( f"calculated aic for multivalent model: {aic_multi} \n" )
+    my_f.write( f"calculated aic for constant signal model: {aic_const} \n" )
 
   if signal_present:
     function_type = "multivalent"
     tag = ""
     # In this case, save, model predict there is a signal and saves data for the onset
-    ave_opt_params, error_onset, average_onset, best_onset_coeffs =  calculate_onset_stat( x_data_all, 
-                                                  y_data_all, 
-                                                  all_opt_params, 
-                                                  weights, best_sample, minimum_loss, 
-                                                  output = output_file, verbose = False, 
-                                                  save_data = True )
+    with open( output_file, "w+" ) as my_f:
+      my_f.write( "Optimal parameters for onset: \n" )
+      for i, value in onset_parameters.items():
+      my_f.write( f"{i}  {value}" )
 
-    plot_fitted_curve( x_data_all, y_data_all, all_opt_params, 
-                 best_sample = best_sample,
-                 onset_coeffs = best_onset_coeffs, 
+    plot_fitted_curve_mle( x_data_all, y_data_all, 
+                 optimal_parameters, 
+                 onset_coeffs = onset_parameters, 
                  function_type = function_type, 
                  graph_name = output_graph, 
                  verbose = False,
                  same_scale = False )
     onset_str = f"{best_onset_coeffs[ 'onset' ]}"
+
   else:
     function_type = "constant"
     output_graph = output_graph[:-4] #Remove the .pdf tag at the end so I can replace it
@@ -172,9 +159,9 @@ for name in sheet_names:
     best_onset_coeffs = {}
     # Plot the graph. Add Tag SIGNAL_NOT_DETECTED if the signal is undetectable = model assuming no binding better 
     # fits the data
-    plot_fitted_curve( x_data_all, y_data_all, all_opt_params_const, 
-                   best_sample = best_sample_const,
-                   onset_coeffs = best_onset_coeffs, 
+    plot_fitted_curve_mle( x_data_all, y_data_all, 
+                   optimal_parameters, 
+                   onset_coeffs = onset_parameters, 
                    function_type = function_type, 
                    graph_name = output_graph + tag, 
                    verbose = False,

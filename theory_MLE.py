@@ -27,7 +27,7 @@ def calculate MLE( param, x_data, y_data, initial_guess, bounds, logarithmic = T
   result = minimize(neg_log_likelihood, initial_guess, bounds = bounds, method='L-BFGS-B')
   estimated_parameter = result.x
 
-  print("Estimated Parameters:", estimated_theta)
+  print("Estimated Parameters:", estimated_parameters)
 
   return estimated_parameter
 

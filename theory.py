@@ -123,7 +123,6 @@ def extract_and_clean_data( my_file, sheet_name, x_name, y_name ):
 
     return x_data, y_data
 
-    
 def find_best_fit( x_data, y_data, bounds, initial_guess, function_type = "multivalent",
                    onset_fitting = False,
                    verbose = False,
@@ -187,6 +186,41 @@ def find_best_fit( x_data, y_data, bounds, initial_guess, function_type = "multi
 
     return all_opt_params, weights, best_sample, minimum_loss
 
+def find_best_fit_mle( x_data, y_data, bounds, initial_guess, function_type = "multivalent",
+                   kernel = RBF(),
+                   alpha_gp =1e-10, # Small alpha for likelihood
+                   n_restarts_optimizer_gp = 10 
+                   onset_fitting = False,
+                   verbose = False )
+
+    #Redefine bound on parameter B to be slightly higher than max_y if needed
+    if bounds[ 1 ][ 1 ] < np.max( y_data ):
+      boundsB = list( bounds[ 1 ] ) 
+      bounds[ 1 ] = ( boundsB[ 0 ], np.max( y_data ) ) 
+      print( f"Max y observed is {np.max( y_data )}" )
+      print( f"Redefined bound on B to be at least as large as y_data, new upper bound is {bounds[1][1]}" )
+
+
+    optimal_parameters = calculate MLE( param, x_data, y_data, initial_guess, bounds, 
+                   logarithmic = True,
+                   kernel = kernel,
+                   alpha_gp = alpha_gp, 
+                   n_restarts_optimizer_gp = n_restarts_optimizer_gp 
+                   )
+
+    if function_type == "multivalent" and onset_fitting:
+          onset, b_coeff, alpha, y0, y_min_value = calculate_onset_from_fit( x_data, y_data, 
+                                                                    optimal_parameters, 
+                                                                    verbose = verbose )
+
+          onset_parameters = {}
+          onset_parameters[ 'onset' ]  = onset
+          onset_parameters[ 'b_coeff' ]  = b_coeff 
+          onset_parameters[ 'alpha' ]  = alpha
+          onset_parameters[ 'y0' ]  = y0
+          onset_parameters[ 'y_min_value' ]  = y_min_value
+
+    return optimal_parameters, onset_parameters
 
 def calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, minimum_loss, 
 		   output = 'output.txt', verbose = False,
@@ -210,6 +244,23 @@ def calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, 
                    minimum_loss, 
                    function_type = "multivalent",
 		   output = output, verbose = False )
+
+    return ave_opt_params, error_onset, average_onset, best_onset_coeffs
+
+def calculate_onset_stat_mle( x_data, y_data, optimal_params, minimum_loss = None, 
+		   output = 'output.txt', verbose = False,
+                   save_data = True ):
+    
+    onset_coeffs = {}  
+    onset_coeffs[ 'onset' ] = optimal_params[ 0 ]
+    onset_coeffs[ 'b_coeff'] = 
+    onset_coeffs[ 'alpha'] = all_opt_params[ best_sample, -3 ]
+    onset_coeffs[ 'y0'] = all_opt_params[ best_sample, -4 ]
+    onset_coeffs[ 'y_value_min'] = all_opt_params[ best_sample, -5 ]
+
+    if save_data:
+    #Save fitting data to file and calculate averages of the fits found during MC procedure
+
 
     return ave_opt_params, error_onset, average_onset, best_onset_coeffs
 
