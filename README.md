@@ -37,3 +37,4 @@ best way to judge the fitting as well as to provide some of the initial guesses 
 Regardless of using the GUI or the standard python script, the code generates 
 1) A graph with the experimental data, the best fitting curve and the geometric construction used to determine it. 
 2) An OUTPUT.txt file containing the results of the fitting and the calculated onset values.
+3) A Summary.txt file containing the results of the statistical significance test and the calculated p-value.

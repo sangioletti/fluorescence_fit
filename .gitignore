@@ -1,3 +1,4 @@
 *.pdf
 OUTPUT*
+OLD*
 __pycache__/
