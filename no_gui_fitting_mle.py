@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+from sklearn.gaussian_process.kernels import RBF
 
 code_directory = "/Users/sangiole/Dropbox/Papers_data_live/Australia-immunology/fit_curves/fluorescence_fit" 
 
@@ -149,7 +150,8 @@ for name in sheet_names:
                  function_type = function_type, 
                  graph_name = output_graph, 
                  verbose = False,
-                 same_scale = False )
+                 same_scale = False,
+                 mle = True )
     onset_str = f"{best_onset_coeffs[ 'onset' ]}"
 
   else:
@@ -159,13 +161,14 @@ for name in sheet_names:
     best_onset_coeffs = {}
     # Plot the graph. Add Tag SIGNAL_NOT_DETECTED if the signal is undetectable = model assuming no binding better 
     # fits the data
-    plot_fitted_curve_mle( x_data_all, y_data_all, 
+    plot_fitted_curve( x_data_all, y_data_all, 
                    optimal_parameters, 
                    onset_coeffs = onset_parameters, 
                    function_type = function_type, 
                    graph_name = output_graph + tag, 
                    verbose = False,
-                   same_scale = False )
+                   same_scale = False,
+                   mle = True )
     #Basically, all you can say is that onset should be larger than max value of x sampled
     onset_str = f"> {np.max( x_data_all )}"
 

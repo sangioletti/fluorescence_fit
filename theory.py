@@ -7,6 +7,7 @@ import scipy
 import scipy.stats as st
 from scipy.stats import f
 from scipy import integrate
+from theory_MLE import calculate_MLE, AIC
 
 # Define the function to fit
 def sample_function( x, a, b, c, d, e):
@@ -201,7 +202,7 @@ def find_best_fit_mle( x_data, y_data, bounds, initial_guess, function_type = "m
       print( f"Redefined bound on B to be at least as large as y_data, new upper bound is {bounds[1][1]}" )
 
 
-    optimal_parameters = calculate MLE( param, x_data, y_data, initial_guess, bounds, 
+    optimal_parameters, log_likelyhood = calculate_MLE( param, x_data, y_data, initial_guess, bounds, 
                    logarithmic = True,
                    kernel = kernel,
                    alpha_gp = alpha_gp, 
@@ -329,10 +330,10 @@ def plot_fitted_curve( x_data, y_data, all_opt_params,
       else: 
         y_fit = sample_constant( x, 
                              a = all_opt_params[ best_sample, 0 ], 
-                             b = all_opt_params[ best_sample, 1 ], 
-                             c = all_opt_params[ best_sample, 2 ], 
-                             d = all_opt_params[ best_sample, 3 ], 
-                             e = all_opt_params[ best_sample, 4 ] )
+                             b = 0.0, 
+                             c = 0.0, 
+                             d = 0.0, 
+                             e = 0.0 )
 
     plt.xscale( 'log' )
     plt.yscale( 'log' )

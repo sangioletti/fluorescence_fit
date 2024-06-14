@@ -4,7 +4,7 @@ from scipy.optimize import minimize
 from sklearn.gaussian_process.kernels import RBF
 from theory import sample_log
 
-def calculate MLE( param, x_data, y_data, initial_guess, bounds, logarithmic = True,
+def calculate_MLE( param, x_data, y_data, initial_guess, bounds, logarithmic = True,
                    kernel = RBF(), 
                    alpha_gp =1e-10, # Small alpha for likelihood
                    n_restarts_optimizer_gp = 10 ) 
