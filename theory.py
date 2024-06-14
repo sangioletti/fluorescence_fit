@@ -247,24 +247,6 @@ def calculate_onset_stat( x_data, y_data, all_opt_params, weights, best_sample, 
 
     return ave_opt_params, error_onset, average_onset, best_onset_coeffs
 
-def calculate_onset_stat_mle( x_data, y_data, optimal_params, minimum_loss = None, 
-		   output = 'output.txt', verbose = False,
-                   save_data = True ):
-    
-    onset_coeffs = {}  
-    onset_coeffs[ 'onset' ] = optimal_params[ 0 ]
-    onset_coeffs[ 'b_coeff'] = 
-    onset_coeffs[ 'alpha'] = all_opt_params[ best_sample, -3 ]
-    onset_coeffs[ 'y0'] = all_opt_params[ best_sample, -4 ]
-    onset_coeffs[ 'y_value_min'] = all_opt_params[ best_sample, -5 ]
-
-    if save_data:
-    #Save fitting data to file and calculate averages of the fits found during MC procedure
-
-
-    return ave_opt_params, error_onset, average_onset, best_onset_coeffs
-
-
 def full_fitting( my_file, sheet_name, x_name, y_name, bounds, initial_guess,
                    function_type = "multivalent", onset_fitting = True, 
 		   output = 'output.txt', graph_name = 'LogLog.pdf', verbose = False,
@@ -294,7 +276,8 @@ def plot_fitted_curve( x_data, y_data, all_opt_params,
                    onset_coeffs, best_sample, 
                    function_type = "multivalent", 
 		   graph_name = 'LogLog.pdf', verbose = False,
-		   same_scale = False ):
+		   same_scale = False
+                   mle = False ):
     
     #Just a sanity check
     assert function_type == 'multivalent' or function_type == 'constant', AssertionError( f"Function type not recognized {function_type}" )
@@ -318,16 +301,33 @@ def plot_fitted_curve( x_data, y_data, all_opt_params,
       x_onset = np.ones( 100 ) * onset
       y_derivative = b_coeff * x_data**alpha 
     
-      # Plot the best fit function 
-      y_fit = sample_function( x, 
+      # Plot the best fit function
+      if mle:
+        y_fit = sample_function( x, 
+                             a = all_opt_params[ 0 ], 
+                             b = all_opt_params[ 1 ], 
+                             c = all_opt_params[ 2 ], 
+                             d = all_opt_params[ 3 ], 
+                             e = all_opt_params[ 4 ] )
+      else: 
+        y_fit = sample_function( x, 
                              a = all_opt_params[ best_sample, 0 ], 
                              b = all_opt_params[ best_sample, 1 ], 
                              c = all_opt_params[ best_sample, 2 ], 
                              d = all_opt_params[ best_sample, 3 ], 
                              e = all_opt_params[ best_sample, 4 ] )
     elif function_type == "constant": 
-      # Plot the best fit function 
-      y_fit = sample_constant( x, 
+      # Plot the best fit function
+      if mle:
+        y_fit = sample_constant( x, 
+                             a = all_opt_params[ 0 ], 
+                             b = 0.0, 
+                             c = 0.0, 
+                             d = 0.0, 
+                             e = 0.0 )
+
+      else: 
+        y_fit = sample_constant( x, 
                              a = all_opt_params[ best_sample, 0 ], 
                              b = all_opt_params[ best_sample, 1 ], 
                              c = all_opt_params[ best_sample, 2 ], 
