@@ -505,6 +505,31 @@ def no_signal( x, a ):
 
     return np.ones( len(x) ) * a 
 
+def gaussian_log_likelyhood( model, sigma2, parameters, x_data, y_data, logarithmic = True, verbose = False ):
+  '''Calculate the likelyhood of the data given a model and its parameters.
+  If logarithmic == True it assumes that the error sigma2 is the variance obtained when fitting
+  the logarithm of the data instead of the data itself. This has nothing to do with using later the 
+  log of the likelyhood, which is done simply to handle a larger range of values
+  '''
+  if logarithmic:
+    y_model = np.log( model( x_data, **parameters ) )
+    y_data = np.log( y_data )
+ 
+  log_prefactor = len( x_data ) * np.log( 1.0 / np.sqrt( 2 * np.pi * sigma2 ) )
+  dy2 = -( ( y_model - y_data )**2 / ( 2 * sigma2 ) )
+  
+  log_likelyhood = log_prefactor + dy2.sum() 
+
+  if verbose:
+    print( f"Parameters {parameters}" )
+    print( f"x in input before likelyhood {x_data[::20]}" ) 
+    print( f"y_data {y_data[::20]}" )
+    print( f"y_model {y_model[::20]}" )
+    print( f"sigma2 {sigma2}" )
+    print( f"log of the likelyhood {log_likelyhood}" )
+  
+  return log_likelyhood
+
 
 def calculate_MLE( model, param, x_data, y_data, initial_guess, bounds, logarithmic = True,
                    kernel = RBF, 
@@ -548,3 +573,4 @@ def AIC( log_likelyhood, param ):
 
 if __name__ == "__main__":
   print( "Nothing to test" )
+
