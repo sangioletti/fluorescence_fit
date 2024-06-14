@@ -331,8 +331,6 @@ def save_fit_data( all_opt_params, best_sample, error_onset, average_onset, onse
         #print("Optimized Parameters:", result.x)
         my_f.write( f'Logarithmic Derivative at midpoint (superselectivity parameter): {alpha} \n' )
         my_f.write( f'Onset for best solution at x = {onset} \n' )
-        my_f.write( f'AVERAGE onset found at x = {average_onset} \n' )
-        my_f.write( f'ERROR on average onset: {error_onset} \n' )
         my_f.write( f"Residual on the logarithm: {minimum_loss} \n" ) 
       elif function_type == "constant":
         my_f.write( "Intensity approximated with constant fitting function f(x) = A \n" )

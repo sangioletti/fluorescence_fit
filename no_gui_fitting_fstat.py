@@ -183,6 +183,12 @@ for name in sheet_names:
     onset_str = f"> {np.max( x_data_all )}"
 
   
-  string = f"Data series: {name}, signal present: {signal_present}, calculated onset: {onset_str}" 
+  string = f"Data series: {name}, signal present: {signal_present}, Calculated p-value: {p_value} \n"
+  if signal_present: 
+    string2 = f"Calculated onset: {onset_str}" 
+  else:
+    string2 = f"No signal found hence no onset" 
   print( string ) 
+  print( string2 ) 
   summary.write(  string + "\n" )
+  summary.write(  string2 + "\n" )

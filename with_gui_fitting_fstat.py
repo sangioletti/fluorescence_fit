@@ -203,9 +203,12 @@ def run_fitting(
   
     summary = open( "SUMMARY.txt", 'w+' )
     summary.write( f"Name of datafile = {my_file} \n" )
-    string = f"Data series: {sheet_name}, signal present: {signal_present}, calculated onset: {onset_str}" 
+    string = f"Data series: {name}, signal present: {signal_present}, Calculated p-value: {p_value} \n"
+    string2 = f"Calculated onset: {onset_str}" 
     print( string ) 
+    print( string2 ) 
     summary.write(  string + "\n" )
+    summary.write(  string2 )
     summary.close()
 
     return
