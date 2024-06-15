@@ -174,14 +174,21 @@ def find_best_fit( x_data, y_data, bounds, initial_guess, function_type = "multi
       all_opt_params[ i, :-5 ] = result.x
 
       if function_type == "multivalent" and onset_fitting:
-          onset, b_coeff, alpha, y0, y_min_value = calculate_onset_from_fit( x_data, y_data, 
+          try:
+              onset, b_coeff, alpha, y0, y_min_value = calculate_onset_from_fit( x_data, y_data, 
                                                                     all_opt_params[ i, :-5 ], 
                                                                     verbose = verbose )
+          except ValueError:
+              print( """Onset not found for this specific git, no worries, continue.
+                      Problem only if no fit at all is found""" )
+              onset, b_coeff, alpha, y0, y_min_value = [ 0.0, 0.0, 0.0, 0.0, 0.0 ] 
+         
           all_opt_params[ i, -1 ] = onset
           all_opt_params[ i, -2 ] = b_coeff 
           all_opt_params[ i, -3 ] = alpha
           all_opt_params[ i, -4 ] = y0
           all_opt_params[ i, -5 ] = y_min_value
+        
 
     return all_opt_params, weights, best_sample, minimum_loss
 
