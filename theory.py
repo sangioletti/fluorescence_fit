@@ -346,7 +346,8 @@ def save_fit_data( all_opt_params, best_sample, error_onset, average_onset, onse
 
     return 
 
-def f_statistic_from_fitted_functions(func1, params1, func2, params2, x_data, y_data, logarithmic = True ):
+def f_statistic_from_fitted_functions(func1, params1, func2, params2, x_data, y_data, 
+                                      logarithmic = True, verbose = False ):
     """
     Calculates the F-statistic to compare two fitted functions.
 
@@ -379,14 +380,33 @@ def f_statistic_from_fitted_functions(func1, params1, func2, params2, x_data, y_
     rss1 = np.sum(residuals1**2)
     rss2 = np.sum(residuals2**2)
 
+    assert len( params2 ) > len( params1 ), AssertionError( "Model 1 should be the simpler (less parameters)")
+    assert rss1 > rss2, AssertionError( """Model 1 should have higher variance, it is the simpler model.
+                                         MC procedure might not find best fit, increase mc_runs and n_hopping.
+                                         If problem persists, it signals the more complex model is not
+                                         better than fitting with a constant = no signal""")
+
     # Determine degrees of freedom (assuming func2 has more parameters)
-    df1 = len(x_data) - len(params2)  # Degrees of freedom for full model
-    df2 = len(params2) - len(params1)  # Additional degrees of freedom for full model
+    n = len(x_data) 
+    p2 = len(params2)  # N of parameters for more complex model
+    p1 = len(params1)  # N of parameters for simpler model
+   
+    n_degree_freedom = n - p2 # Number of degree of freedom for complex model 
+    delta_para = p2 - p1  # Additional degrees of freedom for full model
 
     # Calculate the F-statistic
-    f_stat = ((rss1 - rss2) / df2) / (rss2 / df1)
+    f_stat = ( (rss1 - rss2) / rss2 ) * n_degree_freedom / delta_para
+
+    if verbose:
+      print( f"rss1 {rss1}" ) 
+      print( f"rss2 {rss2}" ) 
+      print( f"p1 {p1}" ) 
+      print( f"p2 {p2}" ) 
+      print( f"n degree of freedom {n_degree_freedom}" ) 
+      print( f"delta_para (4 expected) {delta_para}" ) 
+      print( f"FINAL f_stat {f_stat}" ) 
     
-    return f_stat
+    return f_stat, delta_para, n_degree_freedom
 
 def calculate_p_value(f_statistic, dfn, dfd ):
     """Calculates the p-value for a given F-statistic.
@@ -406,32 +426,42 @@ def calculate_p_value(f_statistic, dfn, dfd ):
     p_value = 1 - st.f.cdf(f_statistic, dfn, dfd)  # Using survival function (sf) for better accuracy
     return p_value
 
-def compare_models_using_p_value( func1, params1, func2, params2, x_data, y_data, p_min, logarithmic = True ):
+def compare_models_using_p_value( func1, params1, func2, params2, x_data, y_data, p_min, 
+                                  logarithmic = True, verbose = False ):
     """Takes two fitted functions as input, the data from which they were fitted and a minimum p-value for significance.
     Then calculates the f-statistics and determined the p-value. If p-value is less than the set minimum, return
     test_passed = True, along with the p_value
     """
     
     try:
-      assert len( params1 ) > len( params2 )
+      #assert len( params1 ) > len( params2 )
+      assert len( params1 ) < len( params2 )
       #The following is only executed if previous assertion is True
       f1 = func1
       p1 = params1
       f2 = func2
       p2 = params2
     except AssertionError:
-      print( "WARNING: You have inverted the complex (more parameters) vs simple (less parameters) model in the input." )
-      print( "I will continue but I will invert their definitions for you. Checking might be better though" )
-      f2 = func1
-      p2 = params1
-      f1 = func2
-      p1 = params2
-      
+      print( "PROBLEM: complex  model should have more parameters, not less...: " )
+      raise AssertionError
+    
+    if verbose:
+      print( f"parameters {p1}" )  
+      print( f"function 1 (constant expected) {f1}" )  
+      print( f"parameters model 2 {p2}" )  
+      print( f"function 2 (multivalent expected) {f2}" )  
+      print( f"xdata {x_data[::100]}" )  
+      print( f"ydata {y_data[::100]}" )  
     #First calculate f_statistics:
-    f_stat = f_statistic_from_fitted_functions(f1, p1, f2, p2, x_data, y_data, logarithmic = True )
-    dfn = len( p1 ) - len( p2 ) 
-    dfd = len( x_data ) - len( p1 ) 
+    f_stat, dfn, dfd  = f_statistic_from_fitted_functions(f1, p1, f2, p2, x_data, y_data, 
+                        logarithmic = True, verbose = verbose )
     p_value = calculate_p_value(f_stat, dfn, dfd )
+   
+    if verbose:
+      print( f"fstat {f_stat}" )
+      print( f"dfn {dfn}" )
+      print( f"dfd {dfd}" )
+      print( f"p-value {p_value}" )
 
     test_passed = p_value < p_min
 
@@ -446,3 +476,14 @@ def no_signal( x, a ):
     To be merged with no_signal in the future.'''
 
     return np.ones( len(x) ) * a 
+
+if __name__ == "__main__":
+  dfn = 4
+  dfd = 3260
+
+  f_stat_tot = np.linspace( 0.0, 300, 100 )
+  
+  for i in f_stat_tot:
+    print( f"{i}" )
+    pval = calculate_p_value(i, dfn, dfd )
+    print( f"fstat {i}, p value {pval}" )

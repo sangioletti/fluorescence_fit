@@ -142,10 +142,11 @@ def run_fitting(
     best_param_constant[ "a" ] = all_opt_params_const[ best_sample_const ][ 0 ]
 
     # Calculate the f-statistic of the model and from that the p_value. Uses p_min to decide if the test is passed or not
-    f_stat, p_value, test_passed = compare_models_using_p_value( func1 = sample_function, 
-                                                       params1 = best_param_multivalent, 
-                                                       func2 = no_signal, 
-                                                       params2 = best_param_constant, 
+    f_stat, p_value, test_passed = compare_models_using_p_value( 
+                                                       func1 = no_signal, 
+                                                       params1 = best_param_constant, 
+                                                       func2 = sample_function, 
+                                                       params2 = best_param_multivalent, 
                                                        x_data = x_data_all, 
                                                        y_data = y_data_all, 
                                                        p_min = p_for_significance, 
