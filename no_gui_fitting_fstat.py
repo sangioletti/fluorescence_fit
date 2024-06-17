@@ -44,8 +44,8 @@ print( f"""This code takes the data from '{my_file}', specifically, from the she
 # PARAMETERS USED. DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING.
 
 # Parameters for fitting using MC basin hopping
-mc_runs = 1 
-n_hopping = 1000
+mc_runs = 8 
+n_hopping = 2000
 T_hopping = 3
 logarithmic_fit = True
 
@@ -133,8 +133,7 @@ for name in sheet_names:
                                                        x_data = x_data_all, 
                                                        y_data = y_data_all, 
                                                        p_min = p_for_significance, 
-                                                       logarithmic = logarithmic_fit,
-                                                       verbose = True, 
+                                                       logarithmic = logarithmic_fit
                                                       )
 
   # This is a bit redundant but I put it for clarity
